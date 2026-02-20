@@ -18,12 +18,12 @@
 mono_crash.*
 
 # Build results
-[Dd]ebug/
+# [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
 
-[Dd]ebug/x64/
+# [Dd]ebug/x64/
 [Dd]ebugPublic/x64/
 [Rr]elease/x64/
 [Rr]eleases/x64/
@@ -428,4 +428,8 @@ FodyWeavers.xsd
 *.msp
 
 # Custom ignores
-!VolumetricFog/Assets/Objects/*.obj
+VolumetricFog/x64/*
+!x64/Debug/**/*.obj
+!x64/Debug/**/*.mtl
+!x64/Debug/**/*.png
+!x64/Debug/**/*.jpg
