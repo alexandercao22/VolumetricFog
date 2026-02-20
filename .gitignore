@@ -428,5 +428,4 @@ FodyWeavers.xsd
 *.msp
 
 # Custom ignores
-!x64/Debug/Materials/
-!x64/Debug/Objects/
+!VolumetricFog/Assets/Objects/*.obj
