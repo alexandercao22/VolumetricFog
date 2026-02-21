@@ -25,16 +25,16 @@ DepthBufferD3D11::~DepthBufferD3D11()
 
 void DepthBufferD3D11::Initialize(ID3D11Device* device, UINT width, UINT height, bool hasSRV, UINT arraySize)
 {
-	D3D11_TEXTURE2D_DESC depthDesc;
+	D3D11_TEXTURE2D_DESC depthDesc = {};
 	depthDesc.Width = width;
 	depthDesc.Height = height;
 	depthDesc.MipLevels = 1;
 	depthDesc.ArraySize = arraySize;
-	depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthDesc.Format = hasSRV ? DXGI_FORMAT_R24G8_TYPELESS : DXGI_FORMAT_D24_UNORM_S8_UINT;
 	depthDesc.SampleDesc.Count = 1;
 	depthDesc.SampleDesc.Quality = 0;
 	depthDesc.Usage = D3D11_USAGE_DEFAULT;
-	depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthDesc.BindFlags = hasSRV ? D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE : D3D11_BIND_DEPTH_STENCIL;
 	depthDesc.CPUAccessFlags = 0;
 	depthDesc.MiscFlags = 0;
 	
@@ -47,8 +47,12 @@ void DepthBufferD3D11::Initialize(ID3D11Device* device, UINT width, UINT height,
 
 	for (int i = 0; i < arraySize; i++)
 	{
+		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+
 		ID3D11DepthStencilView* depthView;
-		hr = device->CreateDepthStencilView(this->texture, nullptr, &depthView);
+		hr = device->CreateDepthStencilView(this->texture, hasSRV ? &dsvDesc : nullptr, &depthView);
 		if (FAILED(hr))
 		{
 			std::cerr << "Failed to create depth stencil\n";
@@ -59,7 +63,12 @@ void DepthBufferD3D11::Initialize(ID3D11Device* device, UINT width, UINT height,
 
 	if (hasSRV)
 	{
-		hr = device->CreateShaderResourceView(this->texture, nullptr, &this->srv);
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = 1;
+
+		hr = device->CreateShaderResourceView(this->texture, &srvDesc, &this->srv);
 		if (FAILED(hr))
 		{
 			std::cerr << "Failed to create depth srv\n";

@@ -42,7 +42,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	// DepthStencilView
-	DepthBufferD3D11 depthStencil(device, WIDTH, HEIGHT, false);
+	DepthBufferD3D11 depthStencil(device, WIDTH, HEIGHT, true);
 
 	// Main Camera
 	MainCamera mainCamera;
@@ -170,6 +170,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ShaderD3D11 cullingPS(device, ShaderType::PIXEL_SHADER, L"CullingPS.cso");
 	CreateInputLayout(device, cullingInputLayout, cullingSemanticNames, std::size(cullingSemanticNames), &cullingVS);
 
+	// Volumetric fog ray-marching compute shader
+	ShaderD3D11 volFogRayCS(device, ShaderType::COMPUTE_SHADER, L"VolumetricFogRayCS.cso");
+
 	MSG msg = { };
 	ShowCursor(FALSE); // Hide cursor
 	SetCursorPos(WIDTH / 2, HEIGHT / 2); // Center cursor
@@ -202,7 +205,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			&particleBuffer, &particleCS, &particleVS, &particleGS, &particlePS, &particleConstantBuffer,
 			&tessellationHS, &tessellationDS, &tessellationMesh, &tessellationPositions,
 			cullingInputLayout.GetInputLayout(), &cullingVS, &cullingPS, &frustumMesh, &frustumCbuffer,
-			&quadTree, &cameraFrustum, meshBoundingBoxLines);
+			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS);
 
 		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 		std::chrono::duration<float> runtime = end - start;
