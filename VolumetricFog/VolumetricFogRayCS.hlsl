@@ -69,4 +69,19 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float viewLength = length(viewDir);
     float3 rayDir = normalize(viewDir);
 
+    // Volumetric fog settings
+    float density = 0.02f; // Fog density
+    float maxDistance = 50.0f;
+    uint steps = 20;
+    float stepSize = 2.0f;
+    float noiseOffset = 2.0f;
+    float4 fogColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    float scattering = 0.6f;
+    
+    float2 pixelCoords = DTid.xy * resolution;
+    float distLimit = min(viewLength, maxDistance);
+    float t = time / max(0.01f, deltaTime);
+    float distTravelled = IGN(pixelCoords, t) * noiseOffset;
+    float transmittance = 1.0f;
+    
 }
