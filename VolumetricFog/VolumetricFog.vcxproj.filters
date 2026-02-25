@@ -137,7 +137,7 @@
     <FxCompile Include="CullingVS.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
-    <FxCompile Include="VolumetricFogCS.hlsl">
+    <FxCompile Include="VolumetricFogRayCS.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>
@@ -213,9 +213,6 @@
     </ClInclude>
     <ClInclude Include="QuadTree.h">
       <Filter>Header Files\Project Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
