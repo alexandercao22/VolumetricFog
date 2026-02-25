@@ -84,4 +84,16 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float distTravelled = IGN(pixelCoords, t) * noiseOffset;
     float transmittance = 1.0f;
     
+    // Ray-marching
+    while (distTravelled < distLimit)
+    {
+        if (density > 0.0f)
+        {
+            fogColor.rgb += directionalLight[0].colour * density * stepSize;
+            transmittance *= exp(-density * stepSize);
+        }
+        distTravelled += stepSize;
+    }
+    
+    backBufferUAV[DTid.xy] = lerp(col, fogColor, 1.0f - saturate(transmittance));
 }
