@@ -263,7 +263,7 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	ShaderD3D11* tessellationHS, ShaderD3D11* tessellationDS, MeshD3D11* tessellationMesh, ConstantBufferD3D11* tessellationPositions,
 	ID3D11InputLayout* inputLayoutCulling, ShaderD3D11* cullingVS, ShaderD3D11* cullingPS, MeshD3D11* frustumMesh,
 	ConstantBufferD3D11* frustumCbuffer, QuadTree<MeshD3D11>* quadTree, DirectX::BoundingFrustum* cameraFrustum,
-	MeshD3D11* meshBoundingBoxLines, ShaderD3D11 *volFogRayCS)
+	MeshD3D11* meshBoundingBoxLines, ShaderD3D11 *volFogRayCS, ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData)
 {
 	context->RSSetViewports(1, &viewport);
 	vertexShader->BindShader(context);
@@ -323,18 +323,14 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	context->CSSetUnorderedAccessViews(0, 1, &DRuav, nullptr);
 	context->Dispatch(240, 135, 1); // X = 1920 / 8 = 240, Y = 1080 / 8 = 135
 
-	/*
-	TODO: Bind volumetric fog ray - marching compute shader
-	Data needed in shader:
-	- depth buffer
-	- final image from defferedCS
-	- directional lights and shadowmaps
-	- back buffer UAV
-	*/
-
+	// Ray-marching volumetric fog
 	ID3D11ShaderResourceView *tempSRV = depthStencil->GetSRV();
+	ID3D11Buffer *rayBuffer = rayConstBuffer->GetBuffer();
+	ID3D11Buffer *rayData = rayConstData->GetBuffer();
 	context->CSSetShaderResources(1, 1, &tempSRV);
 	volFogRayCS->BindShader(context);
+	context->CSSetConstantBuffers(8, 1, &rayBuffer);
+	context->CSSetConstantBuffers(9, 1, &rayData);
 	context->Dispatch(240, 135, 1); // X = 1920 / 8 = 240, Y = 1080 / 8 = 135
 
 	// Unbind the G-buffer SRV's and UAV
