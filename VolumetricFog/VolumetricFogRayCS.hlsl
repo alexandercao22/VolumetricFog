@@ -58,4 +58,15 @@ float IGN(float2 pixel, int frame)
 void main( uint3 DTid : SV_DispatchThreadID )
 {
     backBufferUAV[DTid.xy] = float4(backBufferUAV[DTid.xy].xyz + float3(1.0f, 0.0f, 0.0f), 1.0f);
+    float2 uv = (DTid.xy + 0.5f) / resolution;
+    float4 col = backBufferUAV[DTid.xy];
+    
+    float depth = depthGBuffer.Load(int3(DTid.xy, 0));
+ 
+    float3 worldPos = ComputeWorldSpacePosition(uv, depth, viewProj);
+    
+    float3 viewDir = worldPos - camPos.xyz;
+    float viewLength = length(viewDir);
+    float3 rayDir = normalize(viewDir);
+
 }
