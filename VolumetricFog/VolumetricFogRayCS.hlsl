@@ -57,7 +57,6 @@ float IGN(float2 pixel, int frame)
 [numthreads(8, 8, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
-    backBufferUAV[DTid.xy] = float4(backBufferUAV[DTid.xy].xyz + float3(1.0f, 0.0f, 0.0f), 1.0f);
     float2 uv = (DTid.xy + 0.5f) / resolution;
     float4 col = backBufferUAV[DTid.xy];
     
