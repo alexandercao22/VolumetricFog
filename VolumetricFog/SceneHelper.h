@@ -79,6 +79,13 @@ struct BoundingBoxVertex
 	DirectX::XMFLOAT3 colour;
 };
 
+struct RayData
+{
+	DirectX::XMINT2 resolution;
+	float time;
+	float deltaTime;
+};
+
 void CreateMainCamera(ID3D11DeviceContext* context, ID3D11Device*& device, MainCamera* mainCamera, HWND* window);
 
 void CreateInputLayout(ID3D11Device*& device, InputLayoutD3D11& inputLayout,
@@ -102,7 +109,8 @@ void SetupLights(ID3D11DeviceContext* context, ID3D11Device*& device, SpotLightC
 void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT totalSpotLights, MainCamera* mainCamera,
 	ConstantBufferD3D11* cBufferCS, ID3D11Buffer*& camPosBuffer, ConstantBufferD3D11* camPosConstBuffer,
 	ConstantBufferD3D11* particleConstantBuffer, float particleSize, ConstantBufferD3D11* tessellationPositions,
-	DirectX::XMFLOAT4 moveObj, MeshD3D11* frustumMesh, ConstantBufferD3D11* frustumCbuffer, DirectX::BoundingFrustum* cameraFrustum);
+	DirectX::XMFLOAT4 moveObj, MeshD3D11* frustumMesh, ConstantBufferD3D11* frustumCbuffer, DirectX::BoundingFrustum* cameraFrustum,
+	ConstantBufferD3D11 *rayConstData, float time, float deltaTime);
 
 void SetupReflection(ID3D11Device*& device, const UINT NR_OF_GBUFFERS, ID3D11Texture2D** cubeTextureG,
 	ID3D11ShaderResourceView** cubeSRVg, ID3D11RenderTargetView** cubeRTVg, ID3D11UnorderedAccessView** cubeUAVs,
@@ -117,3 +125,6 @@ void SetupTessellation(ID3D11Device*& device, ConstantBufferD3D11* tessellationP
 void SetupCulling(ID3D11Device*& device, MainCamera* mainCamera, QuadTree<MeshD3D11>* quadTree, MeshD3D11* meshes, size_t totalMeshes,
 	std::vector<MeshBoundPositions>& meshBoundPositions, MeshD3D11* frustumMesh, DirectX::BoundingFrustum* cameraFrustum,
 	ConstantBufferD3D11* frustumCbuffer, MeshD3D11* meshBoundingBoxLines);
+
+void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConstBuffer, MainCamera *mainCamera, 
+	ConstantBufferD3D11 *rayConstData, UINT width, UINT height);

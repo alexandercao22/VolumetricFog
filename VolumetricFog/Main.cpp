@@ -173,6 +173,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// Volumetric fog ray-marching compute shader
 	ShaderD3D11 volFogRayCS(device, ShaderType::COMPUTE_SHADER, L"VolumetricFogRayCS.cso");
+	ConstantBufferD3D11 rayConstBuffer;
+	ConstantBufferD3D11 rayConstData;
+	SetupRayMarchingVolFog(device, &rayConstBuffer, &mainCamera, &rayConstData, WIDTH, HEIGHT);
 
 	MSG msg = { };
 	ShowCursor(FALSE); // Hide cursor
@@ -192,9 +195,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 
+		float t = std::chrono::duration<float>(time.time_since_epoch()).count();
 		UpdatePerFrame(immediateContext, device, totalSpotLights, &mainCamera, &cBufferCS, camPosBuffer,
 			&camPosConstBuffer, &particleConstantBuffer, particleSize, &tessellationPositions, moveObj, &frustumMesh,
-			&frustumCbuffer, &cameraFrustum);
+			&frustumCbuffer, &cameraFrustum, &rayConstData, t, deltaTime);
 
 		RenderShadowMaps(immediateContext, inputLayout.GetInputLayout(), &spotLights, &shadowVS, &cubeView, meshes, totalMeshes,
 			&reflectiveMesh, &directionLight, &tessellationMesh);
@@ -208,7 +212,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			&particleBuffer, &particleCS, &particleVS, &particleGS, &particlePS, &particleConstantBuffer,
 			&tessellationHS, &tessellationDS, &tessellationMesh, &tessellationPositions,
 			cullingInputLayout.GetInputLayout(), &cullingVS, &cullingPS, &frustumMesh, &frustumCbuffer,
-			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS);
+			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS, &rayConstBuffer, &rayConstData);
 
 		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 		std::chrono::duration<float> runtime = end - start;
