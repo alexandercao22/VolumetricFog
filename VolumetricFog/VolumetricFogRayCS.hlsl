@@ -2,6 +2,19 @@ RWTexture2D<unorm float4> backBufferUAV : register(u0);
 
 Texture2D<float4> depthGBuffer : register(t1);
 
+cbuffer camera : register(b8)
+{
+    float4 camPos;
+    matrix viewProj;
+}
+
+cbuffer data : register(b9)
+{
+    uint2 resolution;
+    float time;
+    float deltaTime;
+}
+
 struct DirectionalLightBuffer
 {
     matrix vpMatrix;
