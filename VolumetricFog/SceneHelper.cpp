@@ -560,7 +560,6 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	rayConstBuffer->UpdateBuffer(context, &camData);
 
 	RayData rayData;
-	rayData.resolution = DirectX::XMINT2(1920, 1080);
 	rayData.time = time;
 	rayData.deltaTime = deltaTime;
 	rayConstData->UpdateBuffer(context, &rayData);
@@ -813,7 +812,6 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 	rayConstBuffer->Initialize(device, sizeof(CameraData), &camData);
 
 	RayData rayData;
-	rayData.resolution = DirectX::XMINT2(width, height);
 	rayData.time = 0.0f;
 	rayData.deltaTime = 0.0f;
 	rayConstData->Initialize(device, sizeof(RayData), &rayData);

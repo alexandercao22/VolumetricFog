@@ -12,7 +12,6 @@ cbuffer camera : register(b8)
 
 cbuffer data : register(b9)
 {
-    uint2 resolution;
     float time;
     float deltaTime;
 }
@@ -78,6 +77,8 @@ bool IsSampledPosShadowed(float3 samplePos)
 [numthreads(8, 8, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
+    uint2 resolution;
+    backBufferUAV.GetDimensions(resolution.x, resolution.y);
     float2 uv = (DTid.xy + 0.5f) / resolution;
     float4 col = backBufferUAV[DTid.xy];
     

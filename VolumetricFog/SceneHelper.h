@@ -87,9 +87,9 @@ struct CameraData
 
 struct RayData
 {
-	DirectX::XMINT2 resolution;
 	float time;
 	float deltaTime;
+	DirectX::XMFLOAT2 padding;
 };
 
 void CreateMainCamera(ID3D11DeviceContext* context, ID3D11Device*& device, MainCamera* mainCamera, HWND* window);
