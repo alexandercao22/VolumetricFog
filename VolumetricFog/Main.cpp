@@ -198,7 +198,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		float t = std::chrono::duration<float>(time.time_since_epoch()).count();
 		UpdatePerFrame(immediateContext, device, totalSpotLights, &mainCamera, &cBufferCS, camPosBuffer,
 			&camPosConstBuffer, &particleConstantBuffer, particleSize, &tessellationPositions, moveObj, &frustumMesh,
-			&frustumCbuffer, &cameraFrustum, &rayConstData, t, deltaTime);
+			&frustumCbuffer, &cameraFrustum, &rayConstBuffer, &rayConstData, t, deltaTime);
 
 		RenderShadowMaps(immediateContext, inputLayout.GetInputLayout(), &spotLights, &shadowVS, &cubeView, meshes, totalMeshes,
 			&reflectiveMesh, &directionLight, &tessellationMesh);

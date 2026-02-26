@@ -449,7 +449,7 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	ConstantBufferD3D11* cBufferCS, ID3D11Buffer*& camPosBuffer, ConstantBufferD3D11* camPosConstBuffer,
 	ConstantBufferD3D11* particleConstantBuffer, float particleSize, ConstantBufferD3D11* tessellationPositions,
 	DirectX::XMFLOAT4 moveObj, MeshD3D11* frustumMesh, ConstantBufferD3D11* frustumCbuffer, DirectX::BoundingFrustum* cameraFrustum,
-	ConstantBufferD3D11 *rayConstData, float time, float deltaTime)
+	ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData, float time, float deltaTime)
 {
 	static float lights = 1.0f;
 	if (GetKeyState('L')) // Turn on/off lights
@@ -550,6 +550,16 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	DirectX::XMFLOAT4X4 viewProjMatrix = mainCamera->GetViewProjectionMatrix();
 	DirectX::XMFLOAT4X4 matrices[2] = { worldMatrix, viewProjMatrix };
 	frustumCbuffer->UpdateBuffer(context, &matrices);
+
+	CameraData camData;
+	DirectX::XMFLOAT3 camPos = mainCamera->GetPosition();
+	camData.camPos = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 1.0f);
+	camData.viewProj = mainCamera->GetViewProjectionMatrix();
+
+	DirectX::XMMATRIX invMat = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&camData.viewProj));
+	DirectX::XMStoreFloat4x4(&camData.viewProj, invMat);
+
+	rayConstBuffer->UpdateBuffer(context, &camData);
 
 	RayData rayData;
 	rayData.resolution = DirectX::XMINT2(1920, 1080);
@@ -794,12 +804,6 @@ void SetupCulling(ID3D11Device*& device, MainCamera* mainCamera, QuadTree<MeshD3
 void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConstBuffer, MainCamera *mainCamera, 
 	ConstantBufferD3D11 *rayConstData, UINT width, UINT height)
 {
-	struct CameraData
-	{
-		DirectX::XMFLOAT4 camPos;
-		DirectX::XMFLOAT4X4 viewProj;
-	};
-
 	CameraData camData;
 	DirectX::XMFLOAT3 camPos = mainCamera->GetPosition();
 	camData.camPos = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 1.0f);
