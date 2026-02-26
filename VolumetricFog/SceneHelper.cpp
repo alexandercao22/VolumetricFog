@@ -482,9 +482,9 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	}
 
 	// Update the compute shader constant buffer
-	DirectX::XMFLOAT3 camPosFloat3 = mainCamera->GetPosition();
+	DirectX::XMFLOAT3 camPos = mainCamera->GetPosition();
 	CbufferCS cbuffer;
-	cbuffer.camPos = DirectX::XMFLOAT4(camPosFloat3.x, camPosFloat3.y, camPosFloat3.z, lights);
+	cbuffer.camPos = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, lights);
 	cbuffer.totalSpotLights = totalSpotLights;
 	cbuffer.fullLight = fullLight;
 	cbuffer.shadows = shadows;
@@ -497,7 +497,7 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	ParticleConstantBufferData particleConstantBufferData;
 	particleConstantBufferData.worldMatrix = mainCamera->GetWorldMatrix();
 	particleConstantBufferData.vpMatrix = mainCamera->GetViewProjectionMatrix();
-	particleConstantBufferData.position = mainCamera->GetPosition();
+	particleConstantBufferData.position = camPos;
 	particleConstantBufferData.position.x = particleConstantBufferData.position.x;
 	particleConstantBufferData.position.y = particleConstantBufferData.position.y;
 	particleConstantBufferData.position.z = particleConstantBufferData.position.z;
@@ -505,8 +505,7 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	particleConstantBuffer->UpdateBuffer(context, &particleConstantBufferData);
 
 	Positions positions;
-	DirectX::XMFLOAT3 camPosition = mainCamera->GetPosition();
-	positions.camPosition = { camPosition.x, camPosition.y, camPosition.z, 1.0f };
+	positions.camPosition = { camPos.x, camPos.y, camPos.z, 1.0f };
 	positions.objPosition = moveObj;
 	tessellationPositions->UpdateBuffer(context, &positions);
 
@@ -552,7 +551,6 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	frustumCbuffer->UpdateBuffer(context, &matrices);
 
 	CameraData camData;
-	DirectX::XMFLOAT3 camPos = mainCamera->GetPosition();
 	camData.camPos = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, 1.0f);
 	camData.viewProj = mainCamera->GetViewProjectionMatrix();
 
