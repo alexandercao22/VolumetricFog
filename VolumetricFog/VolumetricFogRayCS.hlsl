@@ -88,6 +88,24 @@ bool IsSampledPosShadowed(float3 samplePos, matrix lightViewProj)
     return sampledDepth < calcDepth;
 }
 
+float CalculateAttenuation(SpotLightBuffer light, float3 samplePos)
+{
+    float3 toLight = normalize(light.position - samplePos);
+    float dotCone = -dot(toLight, normalize(light.direction));
+    float coneAngle = acos(dotCone); // The angle from direction vector to toLight vector.
+    if (coneAngle < light.inAngle) // If inside inner cone, fully lit
+    {
+        return 1.0f;
+    }
+    else if (coneAngle < light.outAngle) // If outside innercone but inside outer cone, attenuate
+    {
+        float coneAttenuation = (coneAngle - light.inAngle) / (light.outAngle - light.inAngle);
+        coneAttenuation = -(coneAttenuation - 1.0f);
+        return coneAttenuation;
+    }
+    return 0.0f; // Outside light cone
+}
+
 float CalculateRdotL(float3 rayDir, float3 lightDir)
 {
     lightDir = normalize(lightDir); // Direction of directional light
@@ -122,7 +140,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float maxDistance = 50.0f;
     float stepSize = 2.0f;
     float noiseOffset = 2.0f;
-    float4 fogColor = 0.0f;
+    float4 fogColor = 0.2f;
     float scattering = 0.3f;
     
     float2 pixelCoords = DTid.xy * resolution;
@@ -152,8 +170,8 @@ void main( uint3 DTid : SV_DispatchThreadID )
             if (density > 0.0f && !isShadowed)
             {
                 float RdotL = CalculateRdotL(rayDir, spotLights[i].direction);
-                float3 inverseCol = 1.0f - spotLights[i].colour;
-                fogColor.rgb += inverseCol * PhaseHG(RdotL, scattering) * density * stepSize;
+                float attenuation = abs(CalculateAttenuation(spotLights[i], sampleWorldPos));
+                fogColor.rgb += spotLights[i].colour * attenuation * PhaseHG(RdotL, scattering) * density * stepSize;
                 transmittance *= exp(-density * stepSize);
             }
         }
@@ -161,6 +179,5 @@ void main( uint3 DTid : SV_DispatchThreadID )
         distTravelled += stepSize;
     }
     
-    //fogColor = float4(NormalizeByMaxComponent(fogColor.xyz), fogColor.a);
     backBufferUAV[DTid.xy] = lerp(col, fogColor, 1.0f - saturate(transmittance));
 }
