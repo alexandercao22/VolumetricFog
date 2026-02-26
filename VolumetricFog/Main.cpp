@@ -303,6 +303,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 * d - Move right
 * lshift - Descend
 * space - Ascend
+* h - Toggle fog
 * j - Toggle shadows
 * k - Toggle full ambient
 * l - Toggle lights
