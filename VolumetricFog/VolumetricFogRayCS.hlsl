@@ -86,7 +86,8 @@ void main( uint3 DTid : SV_DispatchThreadID )
  
     float3 worldPos = ComputeWorldSpacePosition(uv, depth, viewProj);
     
-    float3 viewDir = worldPos - camPos.xyz;
+    //float3 viewDir = worldPos - camPos.xyz; // Does not work for some reason
+    float3 viewDir = worldPos - float3(0.0f, 0.0f, 0.0f);
     float viewLength = length(viewDir);
     float3 rayDir = normalize(viewDir);
 

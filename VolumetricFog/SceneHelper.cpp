@@ -482,7 +482,7 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	}
 
 	// Update the compute shader constant buffer
-	DirectX::XMFLOAT3 camPos = mainCamera->GetPosition();
+	const DirectX::XMFLOAT3 camPos = mainCamera->GetPosition();
 	CbufferCS cbuffer;
 	cbuffer.camPos = DirectX::XMFLOAT4(camPos.x, camPos.y, camPos.z, lights);
 	cbuffer.totalSpotLights = totalSpotLights;
