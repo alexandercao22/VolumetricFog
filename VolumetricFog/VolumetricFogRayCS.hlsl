@@ -1,6 +1,6 @@
 RWTexture2D<unorm float4> backBufferUAV : register(u0);
 
-Texture2D<float4> depthGBuffer : register(t1);
+Texture2D<float4> depthGBuffer : register(t2);
 
 #define SHADOW_EPSILON 0.0001f
 

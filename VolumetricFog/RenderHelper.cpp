@@ -324,10 +324,10 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	context->Dispatch(240, 135, 1); // X = 1920 / 8 = 240, Y = 1080 / 8 = 135
 
 	// Ray-marching volumetric fog
-	ID3D11ShaderResourceView *tempSRV = depthStencil->GetSRV();
+	ID3D11ShaderResourceView *rayDepthSRV = depthStencil->GetSRV();
 	ID3D11Buffer *rayBuffer = rayConstBuffer->GetBuffer();
 	ID3D11Buffer *rayData = rayConstData->GetBuffer();
-	context->CSSetShaderResources(1, 1, &tempSRV);
+	context->CSSetShaderResources(2, 1, &rayDepthSRV);
 	volFogRayCS->BindShader(context);
 	context->CSSetConstantBuffers(8, 1, &rayBuffer);
 	context->CSSetConstantBuffers(9, 1, &rayData);
