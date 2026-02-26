@@ -80,7 +80,7 @@ bool IsSampledPosShadowed(float3 samplePos, matrix lightViewProj, Texture2DArray
     // If the samplePos is outside the light shadow map
     if (lightWorldPos.w <= 0.0f)
         return false;
-    if (abs(ndcSpace.x) > 1.0f || abs(ndcSpace.y > 1.0f))
+    if (abs(ndcSpace.x) > 1.0f || abs(ndcSpace.y) > 1.0f)
         return false;
     
     float3 shadowMapUV = float3(ndcSpace.x * 0.5f + 0.5f, ndcSpace.y * -0.5f + 0.5f, index);
@@ -158,7 +158,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
         bool isShadowed = IsSampledPosShadowed(sampleWorldPos, directionalLight[0].vpMatrix, dirShadowMaps, 0);
         if (density > 0.0f && !isShadowed)
         {
-            float RdotL = CalculateRdotL(rayDir, directionalLight[0].direction);
+            float RdotL = CalculateRdotL(-rayDir, directionalLight[0].direction);
             fogColor.rgb += directionalLight[0].colour * PhaseHG(RdotL, scattering) * density * stepSize;
             transmittance *= exp(-density * stepSize);
         }
@@ -169,7 +169,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
             isShadowed = IsSampledPosShadowed(sampleWorldPos, spotLights[i].vpMatrix, spotShadowMaps, i);
             if (density > 0.0f && !isShadowed)
             {
-                float RdotL = CalculateRdotL(rayDir, spotLights[i].direction);
+                float RdotL = CalculateRdotL(-rayDir, spotLights[i].direction);
                 float attenuation = abs(CalculateAttenuation(spotLights[i], sampleWorldPos));
                 fogColor.rgb += spotLights[i].colour * attenuation * PhaseHG(RdotL, scattering) * density * stepSize;
                 transmittance *= exp(-density * stepSize);
