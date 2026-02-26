@@ -71,7 +71,7 @@ float IGN(float2 pixel, int frame)
     return fmod(52.9829189f * fmod(0.06711056f * float(x) + 0.00583715f * float(y), 1.0f), 1.0f);
 }
 
-bool IsSampledPosShadowed(float3 samplePos, matrix lightViewProj)
+bool IsSampledPosShadowed(float3 samplePos, matrix lightViewProj, Texture2DArray<float> shadowMap)
 {
     float4 lightWorldPos = mul(float4(samplePos, 1.0f), lightViewProj);
     float2 ndcSpace = lightWorldPos.xy / lightWorldPos.w;
@@ -84,7 +84,7 @@ bool IsSampledPosShadowed(float3 samplePos, matrix lightViewProj)
         return false;
     
     float3 shadowMapUV = float3(ndcSpace.x * 0.5f + 0.5f, ndcSpace.y * -0.5f + 0.5f, 0);
-    float sampledDepth = dirShadowMaps.SampleLevel(shadowMapSampler, shadowMapUV, 0) + SHADOW_EPSILON;
+    float sampledDepth = shadowMap.SampleLevel(shadowMapSampler, shadowMapUV, 0) + SHADOW_EPSILON;
     return sampledDepth < calcDepth;
 }
 
@@ -155,7 +155,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
         float3 sampleWorldPos = camPos.xyz + rayDir * distTravelled;
         
         // Directional light
-        bool isShadowed = IsSampledPosShadowed(sampleWorldPos, directionalLight[0].vpMatrix);
+        bool isShadowed = IsSampledPosShadowed(sampleWorldPos, directionalLight[0].vpMatrix, dirShadowMaps);
         if (density > 0.0f && !isShadowed)
         {
             float RdotL = CalculateRdotL(rayDir, directionalLight[0].direction);
@@ -166,7 +166,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
         // Spot lights
         for (int i = 0; i < totalSpotLights; i++)
         {
-            isShadowed = IsSampledPosShadowed(sampleWorldPos, spotLights[i].vpMatrix);
+            isShadowed = IsSampledPosShadowed(sampleWorldPos, spotLights[i].vpMatrix, spotShadowMaps);
             if (density > 0.0f && !isShadowed)
             {
                 float RdotL = CalculateRdotL(rayDir, spotLights[i].direction);
