@@ -45,7 +45,7 @@ float PhaseHG(float cosTheta, float g)
 {
     // https://omlc.org/classroom/ece532/class3/hg.html
     float g2 = g * g;
-    return (1 - g2) / pow(1 + g2 * 2 * g * cosTheta, 1.5);
+    return (1 - g2) / (2 * pow(1 + g2 - 2 * g * cosTheta, 3.0f / 2.0f));
 }
 
 float3 ComputeWorldSpacePosition(float2 uv, float depth, matrix vp)
