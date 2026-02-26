@@ -562,6 +562,7 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	RayData rayData;
 	rayData.time = time;
 	rayData.deltaTime = deltaTime;
+	rayData.totalSpotLights = totalSpotLights;
 	rayConstData->UpdateBuffer(context, &rayData);
 }
 
@@ -799,7 +800,7 @@ void SetupCulling(ID3D11Device*& device, MainCamera* mainCamera, QuadTree<MeshD3
 }
 
 void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConstBuffer, MainCamera *mainCamera, 
-	ConstantBufferD3D11 *rayConstData, UINT width, UINT height)
+	ConstantBufferD3D11 *rayConstData, UINT totalSpotLights)
 {
 	CameraData camData;
 	DirectX::XMFLOAT3 camPos = mainCamera->GetPosition();
@@ -814,5 +815,6 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 	RayData rayData;
 	rayData.time = 0.0f;
 	rayData.deltaTime = 0.0f;
+	rayData.totalSpotLights = totalSpotLights;
 	rayConstData->Initialize(device, sizeof(RayData), &rayData);
 }

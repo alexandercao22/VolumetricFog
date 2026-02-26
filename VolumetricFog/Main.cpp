@@ -175,7 +175,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ShaderD3D11 volFogRayCS(device, ShaderType::COMPUTE_SHADER, L"VolumetricFogRayCS.cso");
 	ConstantBufferD3D11 rayConstBuffer;
 	ConstantBufferD3D11 rayConstData;
-	SetupRayMarchingVolFog(device, &rayConstBuffer, &mainCamera, &rayConstData, WIDTH, HEIGHT);
+	SetupRayMarchingVolFog(device, &rayConstBuffer, &mainCamera, &rayConstData, totalSpotLights);
 
 	MSG msg = { };
 	ShowCursor(FALSE); // Hide cursor

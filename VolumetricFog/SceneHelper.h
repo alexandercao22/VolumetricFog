@@ -89,7 +89,8 @@ struct RayData
 {
 	float time;
 	float deltaTime;
-	DirectX::XMFLOAT2 padding;
+	UINT totalSpotLights;
+	float padding;
 };
 
 void CreateMainCamera(ID3D11DeviceContext* context, ID3D11Device*& device, MainCamera* mainCamera, HWND* window);
@@ -133,4 +134,4 @@ void SetupCulling(ID3D11Device*& device, MainCamera* mainCamera, QuadTree<MeshD3
 	ConstantBufferD3D11* frustumCbuffer, MeshD3D11* meshBoundingBoxLines);
 
 void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConstBuffer, MainCamera *mainCamera, 
-	ConstantBufferD3D11 *rayConstData, UINT width, UINT height);
+	ConstantBufferD3D11 *rayConstData, UINT totalSpotLights);
