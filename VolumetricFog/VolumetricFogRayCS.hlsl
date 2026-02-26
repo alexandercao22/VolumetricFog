@@ -56,7 +56,7 @@ float3 ComputeWorldSpacePosition(float2 uv, float depth, matrix vp)
     
     float4 clipPos = float4(ndc, depth, 1.0f);
     
-    float4 worldPos = mul(clipPos, viewProj);
+    float4 worldPos = mul(clipPos, vp);
     worldPos /= worldPos.w;
     
     return worldPos.xyz;
@@ -143,7 +143,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float4 fogColor = 0.2f;
     float scattering = 0.3f;
     
-    float2 pixelCoords = DTid.xy * resolution;
+    float2 pixelCoords = DTid.xy;
     float distLimit = min(viewLength, maxDistance);
     float t = time / max(0.01f, deltaTime);
     float distTravelled = IGN(pixelCoords, t) * noiseOffset;
@@ -152,13 +152,17 @@ void main( uint3 DTid : SV_DispatchThreadID )
     // Ray-marching
     while (distTravelled < distLimit)
     {
+        if (transmittance < 0.01f)
+            break;
+        
         float3 sampleWorldPos = camPos.xyz + rayDir * distTravelled;
         
         // Directional light
         bool isShadowed = IsSampledPosShadowed(sampleWorldPos, directionalLight[0].vpMatrix, dirShadowMaps, 0);
         if (density > 0.0f && !isShadowed)
         {
-            float RdotL = CalculateRdotL(-rayDir, directionalLight[0].direction);
+            float3 toLight = normalize(directionalLight[0].direction - sampleWorldPos);
+            float RdotL = CalculateRdotL(-rayDir, toLight);
             fogColor.rgb += directionalLight[0].colour * PhaseHG(RdotL, scattering) * density * stepSize;
             transmittance *= exp(-density * stepSize);
         }
@@ -169,7 +173,8 @@ void main( uint3 DTid : SV_DispatchThreadID )
             isShadowed = IsSampledPosShadowed(sampleWorldPos, spotLights[i].vpMatrix, spotShadowMaps, i);
             if (density > 0.0f && !isShadowed)
             {
-                float RdotL = CalculateRdotL(-rayDir, spotLights[i].direction);
+                float3 toLight = normalize(spotLights[i].direction - sampleWorldPos);
+                float RdotL = CalculateRdotL(-rayDir, toLight);
                 float attenuation = abs(CalculateAttenuation(spotLights[i], sampleWorldPos));
                 fogColor.rgb += spotLights[i].colour * attenuation * PhaseHG(RdotL, scattering) * density * stepSize;
                 transmittance *= exp(-density * stepSize);
