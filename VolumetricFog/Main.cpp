@@ -138,7 +138,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ShaderD3D11 particleGS(device, ShaderType::GEOMETRY_SHADER, L"ParticleGS.cso");
 	ShaderD3D11 particlePS(device, ShaderType::PIXEL_SHADER, L"ParticlePS.cso");
 	ConstantBufferD3D11 particleConstantBuffer;
-	SetupParticles(device, &particleBuffer, &mainCamera, &particleConstantBuffer, nrOfParticles, particleSize);
+	ConstantBufferD3D11 particleDeltaTime;
+	SetupParticles(device, &particleBuffer, &mainCamera, &particleConstantBuffer, &particleDeltaTime, nrOfParticles, particleSize);
 
 	// LOD tessellation
 	ShaderD3D11 tessellationHS(device, ShaderType::HULL_SHADER, L"TessellationHS.cso");
@@ -202,7 +203,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		float t = std::chrono::duration<float>(time.time_since_epoch()).count();
 		UpdatePerFrame(immediateContext, device, totalSpotLights, &mainCamera, &cBufferCS, camPosBuffer,
-			&camPosConstBuffer, &particleConstantBuffer, particleSize, &tessellationPositions, moveObj, &frustumMesh,
+			&camPosConstBuffer, &particleConstantBuffer, &particleDeltaTime, particleSize, &tessellationPositions, moveObj, &frustumMesh,
 			&frustumCbuffer, &cameraFrustum, &rayConstBuffer, &rayConstData, t, deltaTime);
 
 		RenderShadowMaps(immediateContext, inputLayout.GetInputLayout(), &spotLights, &shadowVS, &cubeView, meshes, totalMeshes,
@@ -214,7 +215,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		DeferredRendering(immediateContext, &depthStencil, &deferredCS, DRsrv, DRrtv, NR_OF_GBUFFERS, DRuav, viewport,
 			&deferredVS, &deferredPS, inputLayout.GetInputLayout(), &meshSamplerState, meshes, totalMeshes, &reflectiveMesh,
 			&spotLights, &shadowSampler, &directionLight, rtv, &reflectiveCubePS, camPosBuffer, cubeTextureSRV, cubeSamplerState,
-			&particleBuffer, &particleCS, &particleVS, &particleGS, &particlePS, &particleConstantBuffer,
+			&particleBuffer, &particleCS, &particleVS, &particleGS, &particlePS, &particleConstantBuffer, &particleDeltaTime,
 			&tessellationHS, &tessellationDS, &tessellationMesh, &tessellationPositions,
 			cullingInputLayout.GetInputLayout(), &cullingVS, &cullingPS, &frustumMesh, &frustumCbuffer,
 			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS, &rayConstBuffer, &rayConstData);

@@ -113,10 +113,11 @@ void DeferredRenderingSetup(ID3D11DeviceContext* context, ID3D11Device*& device,
 void SetupLights(ID3D11DeviceContext* context, ID3D11Device*& device, SpotLightCollectionD3D11* spotLights,
 	MainCamera* mainCamera, ConstantBufferD3D11* cBufferCS, UINT* totalSpotLights, DirectionalLight* directionLight);
 
-void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT totalSpotLights, MainCamera* mainCamera,
-	ConstantBufferD3D11* cBufferCS, ID3D11Buffer*& camPosBuffer, ConstantBufferD3D11* camPosConstBuffer,
-	ConstantBufferD3D11* particleConstantBuffer, float particleSize, ConstantBufferD3D11* tessellationPositions,
-	DirectX::XMFLOAT4 moveObj, MeshD3D11* frustumMesh, ConstantBufferD3D11* frustumCbuffer, DirectX::BoundingFrustum* cameraFrustum,
+void UpdatePerFrame(ID3D11DeviceContext *context, ID3D11Device *&device, UINT totalSpotLights, MainCamera *mainCamera,
+	ConstantBufferD3D11 *cBufferCS, ID3D11Buffer *&camPosBuffer, ConstantBufferD3D11 *camPosConstBuffer,
+	ConstantBufferD3D11 *particleConstantBuffer, ConstantBufferD3D11 *particleDeltaTime, float particleSize,
+	ConstantBufferD3D11 *tessellationPositions, DirectX::XMFLOAT4 moveObj, MeshD3D11 *frustumMesh,
+	ConstantBufferD3D11 *frustumCbuffer, DirectX::BoundingFrustum *cameraFrustum,
 	ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData, float time, float deltaTime);
 
 void SetupReflection(ID3D11Device*& device, const UINT NR_OF_GBUFFERS, ID3D11Texture2D** cubeTextureG,
@@ -124,7 +125,7 @@ void SetupReflection(ID3D11Device*& device, const UINT NR_OF_GBUFFERS, ID3D11Tex
 	ID3D11Texture2D*& cubeTextures, ID3D11ShaderResourceView*& cubeTextureSRV, UINT size);
 
 void SetupParticles(ID3D11Device*& device, StructuredBufferD3D11* particleBuffer, MainCamera* mainCamera,
-	ConstantBufferD3D11* particleConstantBuffer, int nrOfParticles, float particleSize);
+	ConstantBufferD3D11* particleConstantBuffer, ConstantBufferD3D11 *particleDeltaTime, int nrOfParticles, float particleSize);
 
 void SetupTessellation(ID3D11Device*& device, ConstantBufferD3D11* tessellationPositions, MainCamera* mainCamera,
 	DirectX::XMFLOAT4 moveObj);

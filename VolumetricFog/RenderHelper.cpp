@@ -259,7 +259,7 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	SpotLightCollectionD3D11* spotLights, SamplerD3D11* shadowSampler, DirectionalLight* directionLight,
 	ID3D11RenderTargetView* rtv, ShaderD3D11* reflectiveCubePS, ID3D11Buffer*& camPosBuffer, ID3D11ShaderResourceView*& cubeTextureSRV,
 	ID3D11SamplerState* cubeSamplerState, StructuredBufferD3D11* particleBuffer, ShaderD3D11* particleCS, ShaderD3D11* particleVS,
-	ShaderD3D11* particleGS, ShaderD3D11* particlePS, ConstantBufferD3D11* particleConstantBuffer,
+	ShaderD3D11* particleGS, ShaderD3D11* particlePS, ConstantBufferD3D11* particleConstantBuffer, ConstantBufferD3D11 *particleDeltaTime,
 	ShaderD3D11* tessellationHS, ShaderD3D11* tessellationDS, MeshD3D11* tessellationMesh, ConstantBufferD3D11* tessellationPositions,
 	ID3D11InputLayout* inputLayoutCulling, ShaderD3D11* cullingVS, ShaderD3D11* cullingPS, MeshD3D11* frustumMesh,
 	ConstantBufferD3D11* frustumCbuffer, QuadTree<MeshD3D11>* quadTree, DirectX::BoundingFrustum* cameraFrustum,
@@ -303,7 +303,7 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 
 	// Render meshes
 	RenderReflectiveMesh(context, reflectiveMesh, meshSamplerState);
-	RenderParticles(context, particleBuffer, particleCS, particleVS, particleGS, particlePS, particleConstantBuffer);
+	RenderParticles(context, particleBuffer, particleCS, particleVS, particleGS, particlePS, particleConstantBuffer, particleDeltaTime);
 	if (GetKeyState('B'))
 	{
 		RenderCullingBoxes(context, inputLayoutCulling, cullingVS, cullingPS, deferredCS, frustumMesh, frustumCbuffer,
@@ -351,8 +351,11 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 }
 
 void RenderParticles(ID3D11DeviceContext* context, StructuredBufferD3D11* particleBuffer, ShaderD3D11* particleCS,
-	ShaderD3D11* particleVS, ShaderD3D11* particleGS, ShaderD3D11* particlePS, ConstantBufferD3D11* particleConstantBuffer)
+	ShaderD3D11* particleVS, ShaderD3D11* particleGS, ShaderD3D11* particlePS, 
+	ConstantBufferD3D11* particleConstantBuffer, ConstantBufferD3D11 *particleDeltaTime)
 {
+	ID3D11Buffer *buffer = particleDeltaTime->GetBuffer();
+	context->CSSetConstantBuffers(0, 1, &buffer);
 	particleCS->BindShader(context);
 	ID3D11UnorderedAccessView* uav = particleBuffer->GetUAV();
 	context->CSSetUnorderedAccessViews(0, 1, &uav, nullptr);
@@ -368,7 +371,7 @@ void RenderParticles(ID3D11DeviceContext* context, StructuredBufferD3D11* partic
 	context->VSSetShaderResources(0, 1, &srv);
 
 	particleGS->BindShader(context);
-	ID3D11Buffer* buffer = particleConstantBuffer->GetBuffer();
+	buffer = particleConstantBuffer->GetBuffer();
 	context->GSSetConstantBuffers(0, 1, &buffer);
 
 	particlePS->BindShader(context);

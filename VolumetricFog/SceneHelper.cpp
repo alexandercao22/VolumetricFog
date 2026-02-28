@@ -447,8 +447,9 @@ void SetupLights(ID3D11DeviceContext* context, ID3D11Device*& device, SpotLightC
 
 void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT totalSpotLights, MainCamera* mainCamera,
 	ConstantBufferD3D11* cBufferCS, ID3D11Buffer*& camPosBuffer, ConstantBufferD3D11* camPosConstBuffer,
-	ConstantBufferD3D11* particleConstantBuffer, float particleSize, ConstantBufferD3D11* tessellationPositions,
-	DirectX::XMFLOAT4 moveObj, MeshD3D11* frustumMesh, ConstantBufferD3D11* frustumCbuffer, DirectX::BoundingFrustum* cameraFrustum,
+	ConstantBufferD3D11* particleConstantBuffer, ConstantBufferD3D11 *particleDeltaTime, float particleSize, 
+	ConstantBufferD3D11* tessellationPositions, DirectX::XMFLOAT4 moveObj, MeshD3D11* frustumMesh, 
+	ConstantBufferD3D11* frustumCbuffer, DirectX::BoundingFrustum* cameraFrustum,
 	ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData, float time, float deltaTime)
 {
 	static float lights = 1.0f;
@@ -503,6 +504,9 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	particleConstantBufferData.position.z = particleConstantBufferData.position.z;
 	particleConstantBufferData.particleSize = particleSize;
 	particleConstantBuffer->UpdateBuffer(context, &particleConstantBufferData);
+
+	float deltaTimeData[4] = { deltaTime, 0.0f, 0.0f, 0.0f };
+	particleDeltaTime->UpdateBuffer(context, deltaTimeData);
 
 	Positions positions;
 	positions.camPosition = { camPos.x, camPos.y, camPos.z, 1.0f };
@@ -658,7 +662,7 @@ void SetupReflection(ID3D11Device*& device, const UINT NR_OF_GBUFFERS, ID3D11Tex
 }
 
 void SetupParticles(ID3D11Device*& device, StructuredBufferD3D11* particleBuffer, MainCamera* mainCamera,
-	ConstantBufferD3D11* particleConstantBuffer, int nrOfParticles, float particleSize)
+	ConstantBufferD3D11* particleConstantBuffer, ConstantBufferD3D11 *particleDeltaTime, int nrOfParticles, float particleSize)
 {
 	// Particle positions
 	struct Particle
@@ -701,6 +705,9 @@ void SetupParticles(ID3D11Device*& device, StructuredBufferD3D11* particleBuffer
 	particleConstantBufferData.particleSize = particleSize;
 
 	particleConstantBuffer->Initialize(device, sizeof(ParticleConstantBufferData), &particleConstantBufferData);
+
+	float deltaTime[4] = { 0.0f };
+	particleDeltaTime->Initialize(device, sizeof(float) * 4, deltaTime);
 }
 
 void SetupTessellation(ID3D11Device*& device, ConstantBufferD3D11* tessellationPositions, MainCamera* mainCamera,

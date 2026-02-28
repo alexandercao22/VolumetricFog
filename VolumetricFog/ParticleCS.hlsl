@@ -3,6 +3,12 @@ struct Particle
     float4 pos;
 };
 
+cbuffer buffer : register(b0)
+{
+    float deltaTime;
+    float3 padding;
+}
+
 RWStructuredBuffer<Particle> Particles : register(u0);
 
 #define PI 3.1415927f
@@ -13,14 +19,14 @@ void main( uint3 DTid : SV_DispatchThreadID )
     Particle gettingProcessed = Particles[DTid.x];
     
     // Logic manipulating "gettingProcessed" goes here
-    float fallSpeed = 0.005f;
+    float fallSpeed = 2.0f * deltaTime;
     gettingProcessed.pos.y -= fallSpeed;
     if (gettingProcessed.pos.y < -10.0f)
     {
         gettingProcessed.pos.y = 20.0f;
     }
     
-    float sideSpeed = 0.0025f;
+    float sideSpeed = 1.0f * deltaTime;
     gettingProcessed.pos.w -= sideSpeed;
     if (gettingProcessed.pos.w < -PI)
     {
