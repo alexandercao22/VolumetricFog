@@ -3,9 +3,6 @@
 bool CreateInterfaces(ID3D11Device*& device, ID3D11DeviceContext*& immediateContext, IDXGISwapChain*& swapChain, UINT width, UINT height, HWND window)
 {
 	UINT flags = 0;
-	if (_DEBUG)
-		//flags = D3D11_CREATE_DEVICE_DEBUG;
-		flags = 0;
 
 	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
 
