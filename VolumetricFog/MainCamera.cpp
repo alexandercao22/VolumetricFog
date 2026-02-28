@@ -107,33 +107,36 @@ void MainCamera::Initialize(ID3D11Device* device, const MatrixInfo& matrixInfo)
 
 void MainCamera::MoveForward(float amount)
 {
-	this->MoveInDirection(amount, DirectX::XMFLOAT3(this->forward.x, 0.0f, this->forward.z));
+	this->MoveInDirection(amount * movementSpeed, DirectX::XMFLOAT3(this->forward.x, 0.0f, this->forward.z));
 }
 
 void MainCamera::MoveRight(float amount)
 {
-	this->MoveInDirection(amount, DirectX::XMFLOAT3(this->forward.z, 0.0f, -this->forward.x));
+	this->MoveInDirection(amount * movementSpeed, DirectX::XMFLOAT3(this->forward.z, 0.0f, -this->forward.x));
 }
 
 void MainCamera::MoveUp(float amount)
 {
-	this->MoveInDirection(amount, DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
+	this->MoveInDirection(amount * movementSpeed, DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
 }
 
 void MainCamera::RotateForward(float amount)
 {
+	amount *= mouseSensitivity;
 	this->RotateAroundAxis(amount, this->forward);
 	this->rotation.z = amount;
 }
 
 void MainCamera::RotateRight(float amount)
 {
+	amount *= mouseSensitivity;
 	this->RotateAroundAxis(amount, this->right);
 	this->rotation.x = amount;
 }
 
 void MainCamera::RotateUp(float amount)
 {
+	amount *= mouseSensitivity;
 	this->RotateAroundAxis(amount, DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
 	this->rotation.y = amount;
 }

@@ -41,15 +41,13 @@ void MainCameraMovement(ID3D11DeviceContext* context, MainCamera* mainCamera, fl
 	static DirectX::XMFLOAT3 forward = mainCamera->GetForward();
 	static DirectX::XMFLOAT3 right = mainCamera->GetRight();
 	static DirectX::XMFLOAT3 up = mainCamera->GetUp();
-	//deltaTime = 0.0001f;
-	float movementSpeed = 10.0f * deltaTime;
-	float mouseSensitivity = 2.0f * deltaTime;
 
 	if (GetForegroundWindow() != *window) // Check if the active window is the project window
 	{
 		return;
 	}
 
+	// Camera rotation
 	RECT rect;
 	if (GetWindowRect(*window, &rect)) // Get the dimensions of the window
 	{
@@ -67,26 +65,28 @@ void MainCameraMovement(ID3D11DeviceContext* context, MainCamera* mainCamera, fl
 
 			if (point.x <= centerX - 1) // Look Left
 			{
-				mainCamera->RotateUp(mouseSensitivity * sensX);
+				mainCamera->RotateUp(deltaTime * sensX);
 			}
 			if (point.x >= centerX + 1) // Look Right
 			{
-				mainCamera->RotateUp(mouseSensitivity * sensX);
+				mainCamera->RotateUp(deltaTime * sensX);
 			}
 			if (point.y <= centerY - 1) // Look Up
 			{
 				if (mainCamera->GetForward().y <= 0.99f)
-					mainCamera->RotateRight(mouseSensitivity * sensY);
+					mainCamera->RotateRight(deltaTime * sensY);
 			}
 			if (point.y >= centerY + 1) // Look Down
 			{
 				if (mainCamera->GetForward().y >= -0.99f)
-					mainCamera->RotateRight(mouseSensitivity * sensY);
+					mainCamera->RotateRight(deltaTime * sensY);
 			}
 		}
 		SetCursorPos(centerX, centerY);
 	}
 
+	// Camera movement
+	float movementSpeed = 1.0f * deltaTime;
 	if (GetKeyState(VK_CONTROL) & 0x8000 || GetKeyState(VK_XBUTTON2) & 0x8000) // Speed up
 	{
 		movementSpeed *= 3.0f;

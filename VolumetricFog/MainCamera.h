@@ -35,6 +35,9 @@ private:
 
 	DirectX::BoundingFrustum frustum;
 
+	const float movementSpeed = 5.0f;
+	const float mouseSensitivity = 2.0f;
+
 	void MoveInDirection(float amount, const DirectX::XMFLOAT3& direction);
 	void RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis);
 
