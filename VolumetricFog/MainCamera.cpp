@@ -81,6 +81,9 @@ void MainCamera::TransformFrustum()
 	DirectX::XMMATRIX rotation = DirectX::XMMatrixMultiply(rotateX, rotateY);
 	rotation = DirectX::XMMatrixTranspose(rotation);
 
+	DirectX::XMVECTOR quaternion = DirectX::XMQuaternionNormalize(DirectX::XMLoadFloat4(&this->frustum.Orientation));
+	DirectX::XMStoreFloat4(&this->frustum.Orientation, quaternion);
+
 	this->frustum.Transform(this->frustum, rotation);
 }
 

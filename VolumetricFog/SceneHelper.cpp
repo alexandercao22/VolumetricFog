@@ -512,6 +512,8 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	// Update camera frustum
 	*cameraFrustum = mainCamera->GetFrustum();
 	DirectX::XMFLOAT3 frustumCorners[8];
+	DirectX::XMVECTOR quaternion = DirectX::XMQuaternionNormalize(DirectX::XMLoadFloat4(&cameraFrustum->Orientation));
+	DirectX::XMStoreFloat4(&cameraFrustum->Orientation, quaternion);
 	cameraFrustum->GetCorners(frustumCorners);
 
 	DirectX::XMFLOAT3 colour = { 1.0f, 0.0f, 0.0f };
