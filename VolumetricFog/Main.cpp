@@ -183,11 +183,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ConstantBufferD3D11 camPosConstBuffer;
 	DirectX::XMFLOAT3 tempPos0 = mainCamera.GetPosition();
 	camPosConstBuffer.Initialize(device, sizeof(DirectX::XMFLOAT4), &tempPos0);
+	std::chrono::steady_clock::time_point previousTime = std::chrono::steady_clock::now();
 	float deltaTime = 0.0f;
 	while (!(GetKeyState(VK_ESCAPE) & 0x8000) && msg.message != WM_QUIT)
 	{
-		std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-		time = start;
+		std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+		std::chrono::duration<float> runtime = currentTime - previousTime;
+		previousTime = currentTime;
+		deltaTime = runtime.count();
+
+		time = previousTime;
 
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
@@ -213,10 +218,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			&tessellationHS, &tessellationDS, &tessellationMesh, &tessellationPositions,
 			cullingInputLayout.GetInputLayout(), &cullingVS, &cullingPS, &frustumMesh, &frustumCbuffer,
 			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS, &rayConstBuffer, &rayConstData);
-
-		std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-		std::chrono::duration<float> runtime = end - start;
-		deltaTime = runtime.count();
 
 		MainCameraMovement(immediateContext, &mainCamera, deltaTime, &window);
 		swapChain->Present(0, 0);
