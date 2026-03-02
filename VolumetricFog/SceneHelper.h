@@ -93,6 +93,20 @@ struct RayData
 	float padding;
 };
 
+struct FroxelCameraData
+{
+	DirectX::XMFLOAT3 ray00; float pad0;
+	DirectX::XMFLOAT3 ray10; float pad1;
+	DirectX::XMFLOAT3 ray01; float pad2;
+	DirectX::XMFLOAT3 ray11; float pad3;
+
+	DirectX::XMMATRIX invView;
+	float nearZ;
+	float farZ;
+	UINT totalSpotLights;
+	float padding;
+};
+
 void CreateMainCamera(ID3D11DeviceContext* context, ID3D11Device*& device, MainCamera* mainCamera, HWND* window);
 
 void CreateInputLayout(ID3D11Device*& device, InputLayoutD3D11& inputLayout,
@@ -136,3 +150,5 @@ void SetupCulling(ID3D11Device*& device, MainCamera* mainCamera, QuadTree<MeshD3
 
 void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConstBuffer, MainCamera *mainCamera, 
 	ConstantBufferD3D11 *rayConstData, UINT totalSpotLights);
+
+void SetupFroxelVolFog(ID3D11Device *&device, ConstantBufferD3D11 *volFogCamDataCB, MainCamera *mainCamera, UINT totalSpotLights);

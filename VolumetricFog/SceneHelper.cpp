@@ -827,3 +827,45 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 	rayData.totalSpotLights = totalSpotLights;
 	rayConstData->Initialize(device, sizeof(RayData), &rayData);
 }
+
+void SetupFroxelVolFog(ID3D11Device *&device, ConstantBufferD3D11 *volFogCamDataCB, MainCamera *mainCamera, UINT totalSpotLights)
+{
+	MatrixInfo cameraMatrix = mainCamera->GetMatrixInfo();
+
+	float tanHalfFovY = tanf(cameraMatrix.fovAngleY * 0.5f);
+	float tanHalfFovX = tanHalfFovY * cameraMatrix.aspectRatio;
+
+	float farY = cameraMatrix.farZ * tanHalfFovY;
+	float farX = cameraMatrix.farZ * tanHalfFovX;
+
+	// View-space far plane corners
+	DirectX::XMFLOAT3 r00 = DirectX::XMFLOAT3(-farX, -farY, cameraMatrix.farZ);
+	DirectX::XMFLOAT3 r10 = DirectX::XMFLOAT3(farX, -farY, cameraMatrix.farZ);
+	DirectX::XMFLOAT3 r01 = DirectX::XMFLOAT3(-farX, farY, cameraMatrix.farZ);
+	DirectX::XMFLOAT3 r11 = DirectX::XMFLOAT3(farX, farY, cameraMatrix.farZ);
+
+	// Pre-divide so ray.z == 1
+	r00.x /= cameraMatrix.farZ; r00.y /= cameraMatrix.farZ; r00.z = 1.0f;
+	r10.x /= cameraMatrix.farZ; r10.y /= cameraMatrix.farZ; r10.z = 1.0f;
+	r01.x /= cameraMatrix.farZ; r01.y /= cameraMatrix.farZ; r01.z = 1.0f;
+	r11.x /= cameraMatrix.farZ; r11.y /= cameraMatrix.farZ; r11.z = 1.0f;
+
+	FroxelCameraData froxelCameraData;
+	froxelCameraData.ray00 = r00;
+	froxelCameraData.ray10 = r10;
+	froxelCameraData.ray01 = r01;
+	froxelCameraData.ray11 = r11;
+
+	froxelCameraData.nearZ = cameraMatrix.nearZ;
+	froxelCameraData.farZ = cameraMatrix.farZ;
+
+	DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&mainCamera->GetPosition());
+	DirectX::XMVECTOR focusPos = DirectX::XMLoadFloat3(&mainCamera->GetForward());
+	DirectX::XMVECTOR upDir = DirectX::XMLoadFloat3(&mainCamera->GetUp());
+	froxelCameraData.invView = DirectX::XMMatrixLookAtLH(position, focusPos, upDir);
+	froxelCameraData.invView = DirectX::XMMatrixInverse(nullptr, froxelCameraData.invView);
+
+	froxelCameraData.totalSpotLights = totalSpotLights;
+
+	volFogCamDataCB->Initialize(device, sizeof(FroxelCameraData), volFogCamDataCB);
+}
