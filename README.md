@@ -4,7 +4,7 @@
 
 This project demonstrates two real-time approaches to rendering volumetric fog in a small 3D environment:
 * **Ray-Marched Volumetric Fog**
-* **Voxel-Based Volumetric Fog**
+* **Froxel-Based Volumetric Fog**
 
 ## Keybinds
 * W - Move forward
