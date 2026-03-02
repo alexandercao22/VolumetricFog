@@ -313,12 +313,14 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	RenderTessellatedMesh(context, tessellationMesh, meshSamplerState, tessellationHS, tessellationDS, tessellationPositions,
 		particleConstantBuffer);
 
-	deferredCS->BindShader(context);
-
 	// Unbind RTV's
 	context->OMSetRenderTargets(NR_OF_GBUFFERS, nullRtv, nullptr);
 
+	// Bind froxel-based shaders here
+
+
 	// Bind the compute shader, SRV's and UAV for the CS.
+	deferredCS->BindShader(context);
 	context->CSSetShaderResources(2, NR_OF_GBUFFERS, srvArr);
 	context->CSSetUnorderedAccessViews(0, 1, &DRuav, nullptr);
 	context->Dispatch(240, 135, 1); // X = 1920 / 8 = 240, Y = 1080 / 8 = 135

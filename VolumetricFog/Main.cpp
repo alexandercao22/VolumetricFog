@@ -172,11 +172,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ShaderD3D11 cullingPS(device, ShaderType::PIXEL_SHADER, L"CullingPS.cso");
 	CreateInputLayout(device, cullingInputLayout, cullingSemanticNames, std::size(cullingSemanticNames), &cullingVS);
 
-	// Volumetric fog ray-marching compute shader
+	// Volumetric fog ray-marching
 	ShaderD3D11 volFogRayCS(device, ShaderType::COMPUTE_SHADER, L"VolumetricFogRayCS.cso");
 	ConstantBufferD3D11 rayConstBuffer;
 	ConstantBufferD3D11 rayConstData;
 	SetupRayMarchingVolFog(device, &rayConstBuffer, &mainCamera, &rayConstData, totalSpotLights);
+
+	// Volumetric fog froxel-based
+
 
 	MSG msg = { };
 	ShowCursor(FALSE); // Hide cursor
