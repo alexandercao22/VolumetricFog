@@ -950,7 +950,7 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 		return;
 	}
 
-	hr = device->CreateUnorderedAccessView(froxelLightTexture, &uavDesc, &froxelAccUAV);
+	hr = device->CreateUnorderedAccessView(froxelAccTexture, &uavDesc, &froxelAccUAV);
 	if (FAILED(hr))
 	{
 		std::cerr << "Failed to create 3D texture UAV" << std::endl;
@@ -963,7 +963,7 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 	srvDesc.Texture3D.MipLevels = 1;
 	srvDesc.Texture3D.MostDetailedMip = 0;
 
-	hr = device->CreateShaderResourceView(froxelLightTexture, &srvDesc, &froxelAccSRV);
+	hr = device->CreateShaderResourceView(froxelAccTexture, &srvDesc, &froxelAccSRV);
 	if (FAILED(hr))
 	{
 		std::cerr << "Failed to create 3D texture SRV" << std::endl;
