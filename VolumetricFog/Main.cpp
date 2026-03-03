@@ -179,7 +179,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	SetupRayMarchingVolFog(device, &rayConstBuffer, &mainCamera, &rayConstData, totalSpotLights);
 
 	// Volumetric fog froxel-based
-	ShaderD3D11 volFogFroxelPropertyCS(device, ShaderType::COMPUTE_SHADER, L"VolumetricFogFroxelAccumulation.cso");
+	ShaderD3D11 volFogFroxelAccumulateCS(device, ShaderType::COMPUTE_SHADER, L"VolumetricFogFroxelAccumulation.cso");
 	ShaderD3D11 volFogFroxelLightCS(device, ShaderType::COMPUTE_SHADER, L"VolumetricFogFroxelLight.cso");
 	ConstantBufferD3D11 froxelRaysCB;
 	ConstantBufferD3D11 froxelDataCB;
@@ -230,7 +230,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			&tessellationHS, &tessellationDS, &tessellationMesh, &tessellationPositions,
 			cullingInputLayout.GetInputLayout(), &cullingVS, &cullingPS, &frustumMesh, &frustumCbuffer,
 			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS, &rayConstBuffer, &rayConstData,
-			&volFogFroxelLightCS, froxelUAV, &volFogFroxelPropertyCS, &froxelRaysCB, &froxelDataCB, &froxelCamCB);
+			&volFogFroxelLightCS, froxelUAV, &volFogFroxelAccumulateCS, &froxelRaysCB, &froxelDataCB, &froxelCamCB);
 
 		MainCameraMovement(immediateContext, &mainCamera, deltaTime, &window);
 		swapChain->Present(0, 0);
