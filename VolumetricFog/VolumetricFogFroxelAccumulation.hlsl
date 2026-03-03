@@ -1,7 +1,7 @@
-RWTexture3D<float4> input : register(uX);        // Input
-RWTexture3D<unorm float4> output : register(uX); // Output
+RWTexture3D<float4> input : register(u2);        // Input
+RWTexture3D<float4> output : register(u3); // Output
 
-cbuffer data : register(bX)
+cbuffer data : register(b9)
 {
     float nearPlane;
     float farPlane;

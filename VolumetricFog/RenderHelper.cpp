@@ -263,8 +263,9 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	ShaderD3D11* tessellationHS, ShaderD3D11* tessellationDS, MeshD3D11* tessellationMesh, ConstantBufferD3D11* tessellationPositions,
 	ID3D11InputLayout* inputLayoutCulling, ShaderD3D11* cullingVS, ShaderD3D11* cullingPS, MeshD3D11* frustumMesh,
 	ConstantBufferD3D11* frustumCbuffer, QuadTree<MeshD3D11>* quadTree, DirectX::BoundingFrustum* cameraFrustum,
-	MeshD3D11* meshBoundingBoxLines, ShaderD3D11 *volFogRayCS, ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData,
-	ShaderD3D11* volFogFroxelAccumulation)
+	MeshD3D11 *meshBoundingBoxLines, ShaderD3D11 *volFogRayCS, ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData,
+	ShaderD3D11 *volFogFroxelLightCS, ID3D11UnorderedAccessView *&froxelUAV, ConstantBufferD3D11 *volFogCamDataCB,
+	ShaderD3D11 *volFogFroxelAccumulation)
 {
 	context->RSSetViewports(1, &viewport);
 	vertexShader->BindShader(context);

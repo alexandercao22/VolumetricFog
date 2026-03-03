@@ -179,11 +179,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	SetupRayMarchingVolFog(device, &rayConstBuffer, &mainCamera, &rayConstData, totalSpotLights);
 
 	// Volumetric fog froxel-based
-	ShaderD3D11 volFogFroxelPropertyCS(device, ShaderType::COMPUTE_SHADER, L"VolumetricFoxFroxelAccumulation.cso");
+	ShaderD3D11 volFogFroxelPropertyCS(device, ShaderType::COMPUTE_SHADER, L"VolumetricFogFroxelAccumulation.cso");
 	ShaderD3D11 volFogFroxelLightCS(device, ShaderType::COMPUTE_SHADER, L"VolumetricFogFroxelLight.cso");
 	ConstantBufferD3D11 volFogCamDataCB;
 	ID3D11Texture3D *froxelTexture;
-	SetupFroxelVolFog(device, &volFogCamDataCB, &mainCamera, totalSpotLights, froxelTexture);
+	ID3D11UnorderedAccessView *froxelUAV = nullptr;
+	SetupFroxelVolFog(device, &volFogCamDataCB, &mainCamera, totalSpotLights, froxelTexture, froxelUAV);
 
 	MSG msg = { };
 	ShowCursor(FALSE); // Hide cursor
@@ -225,7 +226,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			&particleBuffer, &particleCS, &particleVS, &particleGS, &particlePS, &particleConstantBuffer, &particleDeltaTime,
 			&tessellationHS, &tessellationDS, &tessellationMesh, &tessellationPositions,
 			cullingInputLayout.GetInputLayout(), &cullingVS, &cullingPS, &frustumMesh, &frustumCbuffer,
-			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS, &rayConstBuffer, &rayConstData);
+			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS, &rayConstBuffer, &rayConstData,
+			&volFogFroxelLightCS, froxelUAV, &volFogCamDataCB, &volFogFroxelPropertyCS);
 
 		MainCameraMovement(immediateContext, &mainCamera, deltaTime, &window);
 		swapChain->Present(0, 0);

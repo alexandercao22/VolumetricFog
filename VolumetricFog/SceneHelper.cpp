@@ -829,7 +829,7 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 }
 
 void SetupFroxelVolFog(ID3D11Device *&device, ConstantBufferD3D11 *volFogCamDataCB, MainCamera *mainCamera, UINT totalSpotLights,
-	ID3D11Texture3D *&froxelTexture)
+	ID3D11Texture3D *&froxelTexture, ID3D11UnorderedAccessView *&froxelUAV)
 {
 	MatrixInfo cameraMatrix = mainCamera->GetMatrixInfo();
 
