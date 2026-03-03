@@ -943,7 +943,7 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 	uavDesc.Texture3D.FirstWSlice = 0;
 	uavDesc.Texture3D.WSize = froxelDesc.Depth;
 
-	hr = device->CreateUnorderedAccessView(froxelLightTexture, &uavDesc, &froxelAccUAV);
+	hr = device->CreateUnorderedAccessView(froxelLightTexture, &uavDesc, &froxelLightUAV);
 	if (FAILED(hr))
 	{
 		std::cerr << "Failed to create 3D texture UAV" << std::endl;
