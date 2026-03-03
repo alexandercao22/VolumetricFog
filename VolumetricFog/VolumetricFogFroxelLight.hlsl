@@ -107,13 +107,15 @@ float PhaseHG(float cosTheta, float g)
     return (1 - g2) / (2 * pow(1 + g2 - 2 * g * cosTheta, 3.0f / 2.0f));
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(8, 8, 4)] // UAV dimensions = 160, 90, 32. Dispatch(20, 12, 8)
 void main( uint3 DTid : SV_DispatchThreadID )
 {
     float3 worldPos = FroxelToWorldPos(DTid);
     
     // Volumetric fog settings
-    float scattering = 0.3f;
+    float3 fogColor = float3(1.0f, 1.0f, 1.0f);
+    float density = 0.5f;
+    float scattering = fogColor * density;
     
     // Directional light
     bool isShadowed = IsSampledPosShadowed(worldPos, directionalLight[0].vpMatrix, dirShadowMaps, 0);
