@@ -1,5 +1,5 @@
-RWTexture3D<float4> input : register(u2);        // Input
-RWTexture3D<float4> output : register(u3); // Output
+RWTexture3D<float4> froxelLightUAV : register(u1); // Input
+RWTexture3D<float4> froxelAccUAV : register(u2); // Output
 
 cbuffer FroxelCameraCB : register(b9)
 {
@@ -14,7 +14,7 @@ cbuffer FroxelCameraCB : register(b9)
 void main(uint3 DTid : SV_DispatchThreadID)
 {
     uint3 dimensions;
-    output.GetDimensions(dimensions.x, dimensions.y, dimensions.z);
+    froxelAccUAV.GetDimensions(dimensions.x, dimensions.y, dimensions.z);
     
     // Bounds check?
     
@@ -26,7 +26,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     {
         uint3 cellCoord = uint3(DTid.xy, i);
         
-        float4 cellData = input[cellCoord];
+        float4 cellData = froxelLightUAV[cellCoord];
         float3 cellScattering = cellData.xyz;
         float cellDensity = cellData.a;
         
@@ -40,6 +40,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
         float3 scatteringIntegral = cellScattering * (1.0f - transmittance) / max(cellDensity, 0.00001f);
         accumulated.rgb += scatteringIntegral * accumulated.a;
         
-        output[cellCoord] = accumulated;
+        froxelAccUAV[cellCoord] = accumulated;
     }
 }

@@ -1,4 +1,4 @@
-RWTexture3D<float4> fogDataUAV : register(u1);
+RWTexture3D<float4> froxelLightUAV : register(u1);
 
 #define SHADOW_EPSILON 0.0001f
 
@@ -46,7 +46,7 @@ sampler shadowMapSampler : register(s0);
 float3 FroxelToWorldPos(uint3 id)
 {
     uint3 dimension;
-    fogDataUAV.GetDimensions(dimension.x, dimension.y, dimension.z);
+    froxelLightUAV.GetDimensions(dimension.x, dimension.y, dimension.z);
     
     float2 uv = (id.xy + 0.5f) / dimension.xy;
 
@@ -113,6 +113,8 @@ float PhaseHG(float cosTheta, float g)
 [numthreads(8, 8, 4)] // UAV dimensions = 160, 90, 32. Dispatch(20, 12, 8)
 void main( uint3 DTid : SV_DispatchThreadID )
 {
+    froxelLightUAV[DTid] = 0;
+    
     float3 worldPos = FroxelToWorldPos(DTid);
     
     // Volumetric fog settings
@@ -126,7 +128,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     {
         float3 toLight = normalize(directionalLight[0].direction - worldPos);
         float RdotL = CalculateRdotL(-float3(DTid), toLight);
-        fogDataUAV[DTid] += float4(directionalLight[0].colour * PhaseHG(RdotL, scattering), 1.0f);
+        froxelLightUAV[DTid] += float4(directionalLight[0].colour * PhaseHG(RdotL, scattering), 1.0f);
     }
     
     // Spot lights
@@ -138,7 +140,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
             float3 toLight = normalize(spotLights[i].direction - worldPos);
             float RdotL = CalculateRdotL(-float3(DTid), toLight);
             float attenuation = abs(CalculateAttenuation(spotLights[i], worldPos));
-            fogDataUAV[DTid] += float4(spotLights[i].colour * attenuation * PhaseHG(RdotL, scattering), 1.0f);
+            froxelLightUAV[DTid] += float4(spotLights[i].colour * attenuation * PhaseHG(RdotL, scattering), 1.0f);
         }
     }
 }

@@ -857,7 +857,8 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 
 void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT totalSpotLights,
 	ConstantBufferD3D11 *froxelRaysCB, ConstantBufferD3D11 *froxelDataCB, ConstantBufferD3D11 *froxelCamCB,
-	ID3D11Texture3D *&froxelTexture, ID3D11UnorderedAccessView *&froxelUAV)
+	ID3D11Texture3D *&froxelLightTexture, ID3D11UnorderedAccessView *&froxelLightUAV,
+	ID3D11Texture3D *&froxelAccTexture, ID3D11UnorderedAccessView *&froxelAccUAV)
 {
 	MatrixInfo cameraMatrix = mainCamera->GetMatrixInfo();
 
@@ -920,9 +921,19 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 	froxelDesc.CPUAccessFlags = 0;
 	froxelDesc.MiscFlags = 0;
 
-	HRESULT hr = device->CreateTexture3D(&froxelDesc, nullptr, &froxelTexture);
+	HRESULT hr = device->CreateTexture3D(&froxelDesc, nullptr, &froxelLightTexture);
 	if (FAILED(hr))
+	{
+		std::cerr << "Failed to create 3D texture" << std::endl;
 		return;
+	}
+
+	hr = device->CreateTexture3D(&froxelDesc, nullptr, &froxelAccTexture);
+	if (FAILED(hr))
+	{
+		std::cerr << "Failed to create 3D texture" << std::endl;
+		return;
+	}
 
 	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 	uavDesc.Format = froxelDesc.Format;
@@ -931,8 +942,17 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 	uavDesc.Texture3D.FirstWSlice = 0;
 	uavDesc.Texture3D.WSize = froxelDesc.Depth;
 
-	ID3D11UnorderedAccessView *uav = nullptr;
-	hr = device->CreateUnorderedAccessView(froxelTexture, &uavDesc, &uav);
+	hr = device->CreateUnorderedAccessView(froxelLightTexture, &uavDesc, &froxelAccUAV);
 	if (FAILED(hr))
+	{
+		std::cerr << "Failed to create 3D texture UAV" << std::endl;
 		return;
+	}
+
+	hr = device->CreateUnorderedAccessView(froxelLightTexture, &uavDesc, &froxelAccUAV);
+	if (FAILED(hr))
+	{
+		std::cerr << "Failed to create 3D texture UAV" << std::endl;
+		return;
+	}
 }

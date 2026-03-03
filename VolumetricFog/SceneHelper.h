@@ -165,4 +165,5 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 
 void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT totalSpotLights,
 	ConstantBufferD3D11 *froxelRaysCB, ConstantBufferD3D11 *froxelDataCB, ConstantBufferD3D11 *froxelCamCB,
-	ID3D11Texture3D *&froxelTexture, ID3D11UnorderedAccessView *&froxelUAV);
+	ID3D11Texture3D *&froxelLightTexture, ID3D11UnorderedAccessView *&froxelLightUAV,
+	ID3D11Texture3D *&froxelAccTexture, ID3D11UnorderedAccessView *&froxelAccUAV);
