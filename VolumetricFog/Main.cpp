@@ -188,6 +188,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ID3D11UnorderedAccessView *froxelUAV = nullptr;
 	SetupFroxelVolFog(device, &mainCamera, totalSpotLights, &froxelRaysCB, &froxelDataCB, &froxelCamCB,
 		froxelTexture, froxelUAV);
+	
+	bool renderFog = true;
+	bool useFroxelFog = false;
 
 	MSG msg = { };
 	ShowCursor(FALSE); // Hide cursor
@@ -215,7 +218,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		float t = std::chrono::duration<float>(time.time_since_epoch()).count();
 		UpdatePerFrame(immediateContext, device, totalSpotLights, &mainCamera, &cBufferCS, camPosBuffer,
 			&camPosConstBuffer, &particleConstantBuffer, &particleDeltaTime, particleSize, &tessellationPositions, moveObj, &frustumMesh,
-			&frustumCbuffer, &cameraFrustum, &rayConstBuffer, &rayConstData, t, deltaTime);
+			&frustumCbuffer, &cameraFrustum, &rayConstBuffer, &rayConstData, t, deltaTime, &froxelDataCB, renderFog, useFroxelFog);
 
 		RenderShadowMaps(immediateContext, inputLayout.GetInputLayout(), &spotLights, &shadowVS, &cubeView, meshes, totalMeshes,
 			&reflectiveMesh, &directionLight, &tessellationMesh);
@@ -230,7 +233,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			&tessellationHS, &tessellationDS, &tessellationMesh, &tessellationPositions,
 			cullingInputLayout.GetInputLayout(), &cullingVS, &cullingPS, &frustumMesh, &frustumCbuffer,
 			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS, &rayConstBuffer, &rayConstData,
-			&volFogFroxelLightCS, froxelUAV, &volFogFroxelAccumulateCS, &froxelRaysCB, &froxelDataCB, &froxelCamCB);
+			&volFogFroxelLightCS, froxelUAV, &volFogFroxelAccumulateCS, &froxelRaysCB, &froxelDataCB, &froxelCamCB, 
+			renderFog, useFroxelFog);
 
 		MainCameraMovement(immediateContext, &mainCamera, deltaTime, &window);
 		swapChain->Present(0, 0);
@@ -311,16 +315,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 /*
 * Keybinds
-* w - Move forward
-* a - Move left
-* s - Move backward
-* d - Move right
-* lshift - Descend
-* space - Ascend
-* h - Toggle fog
-* j - Toggle shadows
-* k - Toggle full ambient
-* l - Toggle lights
-* v - Detach/attach frustum
-* b - Toggle bounding boxes
+* W - Move forward
+* A - Move left
+* S - Move backward
+* D - Move right
+* LSHIFT - Descend
+* SPACE - Ascend
+* G - Toggle fog mode
+* H - Toggle fog
+* J - Toggle shadows
+* K - Toggle full ambient
+* L - Toggle lights
+* V - Detach/attach frustum
+* B - Toggle bounding boxes
 */

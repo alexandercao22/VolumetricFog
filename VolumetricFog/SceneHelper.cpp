@@ -450,16 +450,43 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	ConstantBufferD3D11* particleConstantBuffer, ConstantBufferD3D11 *particleDeltaTime, float particleSize, 
 	ConstantBufferD3D11* tessellationPositions, DirectX::XMFLOAT4 moveObj, MeshD3D11* frustumMesh, 
 	ConstantBufferD3D11* frustumCbuffer, DirectX::BoundingFrustum* cameraFrustum,
-	ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData, float time, float deltaTime)
+	ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData, float time, float deltaTime,
+	ConstantBufferD3D11 *froxelDataCB, bool &renderFog, bool &useFroxelFog)
 {
-	static float lights = 1.0f;
-	if (GetKeyState('L')) // Turn on/off lights
 	{
-		lights = 0.0f;
+		if (GetKeyState('G')) // Toggle fog mode
+		{
+			useFroxelFog = true;
+		}
+		else
+		{
+			useFroxelFog = false;
+		}
+
+		FroxelData froxelData;
+		froxelData.useFroxelFog = useFroxelFog;
+		froxelData.nearZ = mainCamera->GetMatrixInfo().nearZ;
+		froxelData.farZ = mainCamera->GetMatrixInfo().farZ;
+		froxelDataCB->UpdateBuffer(context, &froxelData);
+	}
+
+	if (GetKeyState('H')) // Turn on/off fog
+	{
+		renderFog = false;
 	}
 	else
 	{
-		lights = 1.0f;
+		renderFog = true;
+	}
+
+	static float shadows = 1.0f;
+	if (GetKeyState('J')) // Turn on/off shadows
+	{
+		shadows = 0.0f;
+	}
+	else
+	{
+		shadows = 1.0f;
 	}
 
 	static float fullLight = 0.0f;
@@ -472,14 +499,14 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 		fullLight = 0.0f;
 	}
 
-	static float shadows = 1.0f;
-	if (GetKeyState('J')) // Turn on/off shadows
+	static float lights = 1.0f;
+	if (GetKeyState('L')) // Turn on/off lights
 	{
-		shadows = 0.0f;
+		lights = 0.0f;
 	}
 	else
 	{
-		shadows = 1.0f;
+		lights = 1.0f;
 	}
 
 	// Update the compute shader constant buffer

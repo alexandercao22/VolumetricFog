@@ -143,7 +143,8 @@ void UpdatePerFrame(ID3D11DeviceContext *context, ID3D11Device *&device, UINT to
 	ConstantBufferD3D11 *particleConstantBuffer, ConstantBufferD3D11 *particleDeltaTime, float particleSize,
 	ConstantBufferD3D11 *tessellationPositions, DirectX::XMFLOAT4 moveObj, MeshD3D11 *frustumMesh,
 	ConstantBufferD3D11 *frustumCbuffer, DirectX::BoundingFrustum *cameraFrustum,
-	ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData, float time, float deltaTime);
+	ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData, float time, float deltaTime,
+	ConstantBufferD3D11 *froxelDataCB, bool &renderFog, bool &useFroxelFog);
 
 void SetupReflection(ID3D11Device*& device, const UINT NR_OF_GBUFFERS, ID3D11Texture2D** cubeTextureG,
 	ID3D11ShaderResourceView** cubeSRVg, ID3D11RenderTargetView** cubeRTVg, ID3D11UnorderedAccessView** cubeUAVs,
