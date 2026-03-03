@@ -41,7 +41,11 @@ cbuffer constantBuffer : register(b1)
     uint totalSpotLights;
     float fullLight;
     float shadows;
-    bool useFroxelFog;
+}
+
+cbuffer froxelData : register(b2)
+{
+    int useFroxelFog;
     float nearZ;
     float farZ;
 }

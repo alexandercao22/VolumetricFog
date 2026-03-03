@@ -265,7 +265,7 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	ConstantBufferD3D11* frustumCbuffer, QuadTree<MeshD3D11>* quadTree, DirectX::BoundingFrustum* cameraFrustum,
 	MeshD3D11 *meshBoundingBoxLines, ShaderD3D11 *volFogRayCS, ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData,
 	ShaderD3D11 *volFogFroxelLightCS, ID3D11UnorderedAccessView *&froxelUAV, ConstantBufferD3D11 *volFogCamDataCB,
-	ShaderD3D11 *volFogFroxelAccumulation)
+	ShaderD3D11 *volFogFroxelAccumulation, ConstantBufferD3D11 *froxelDataCB)
 {
 	context->RSSetViewports(1, &viewport);
 	vertexShader->BindShader(context);
@@ -318,12 +318,19 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	// Unbind RTV's
 	context->OMSetRenderTargets(NR_OF_GBUFFERS, nullRtv, nullptr);
 
-	// Bind froxel-based shaders here
+	// Bind froxel-based shaders
+	volFogFroxelLightCS->BindShader(context);
+	ID3D11Buffer *froxelCB = volFogCamDataCB->GetBuffer();
+	context->CSSetConstantBuffers(8, 1, &froxelCB);
+	context->CSSetUnorderedAccessViews(1, 1, &froxelUAV, nullptr);
+	//context->Dispatch(1, 1, 1);
 
 	volFogFroxelAccumulation->BindShader(context);
 	context->Dispatch(160, 90, 64); // 3D texture resolution (subject to change)
 
 	// Bind the compute shader, SRV's and UAV for the CS.
+	froxelCB = froxelDataCB->GetBuffer();
+	context->CSSetConstantBuffers(2, 1, &froxelCB);
 	deferredCS->BindShader(context);
 	context->CSSetShaderResources(2, NR_OF_GBUFFERS, srvArr);
 	context->CSSetUnorderedAccessViews(0, 1, &DRuav, nullptr);

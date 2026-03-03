@@ -829,7 +829,7 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 }
 
 void SetupFroxelVolFog(ID3D11Device *&device, ConstantBufferD3D11 *volFogCamDataCB, MainCamera *mainCamera, UINT totalSpotLights,
-	ID3D11Texture3D *&froxelTexture, ID3D11UnorderedAccessView *&froxelUAV)
+	ID3D11Texture3D *&froxelTexture, ID3D11UnorderedAccessView *&froxelUAV, ConstantBufferD3D11 *froxelDataCB)
 {
 	MatrixInfo cameraMatrix = mainCamera->GetMatrixInfo();
 
@@ -897,4 +897,11 @@ void SetupFroxelVolFog(ID3D11Device *&device, ConstantBufferD3D11 *volFogCamData
 	hr = device->CreateUnorderedAccessView(froxelTexture, &uavDesc, &uav);
 	if (FAILED(hr))
 		return;
+
+	// Froxel data
+	FroxelData froxelData;
+	froxelData.useFroxelFog = 0;
+	froxelData.nearZ = mainCamera->GetMatrixInfo().nearZ;
+	froxelData.farZ = mainCamera->GetMatrixInfo().farZ;
+	froxelDataCB->Initialize(device, sizeof(FroxelData), &froxelData);
 }

@@ -184,7 +184,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ConstantBufferD3D11 volFogCamDataCB;
 	ID3D11Texture3D *froxelTexture;
 	ID3D11UnorderedAccessView *froxelUAV = nullptr;
-	SetupFroxelVolFog(device, &volFogCamDataCB, &mainCamera, totalSpotLights, froxelTexture, froxelUAV);
+	ConstantBufferD3D11 froxelDataCB;
+	SetupFroxelVolFog(device, &volFogCamDataCB, &mainCamera, totalSpotLights, froxelTexture, froxelUAV, &froxelDataCB);
 
 	MSG msg = { };
 	ShowCursor(FALSE); // Hide cursor
@@ -227,7 +228,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			&tessellationHS, &tessellationDS, &tessellationMesh, &tessellationPositions,
 			cullingInputLayout.GetInputLayout(), &cullingVS, &cullingPS, &frustumMesh, &frustumCbuffer,
 			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS, &rayConstBuffer, &rayConstData,
-			&volFogFroxelLightCS, froxelUAV, &volFogCamDataCB, &volFogFroxelPropertyCS);
+			&volFogFroxelLightCS, froxelUAV, &volFogCamDataCB, &volFogFroxelPropertyCS, &froxelDataCB);
 
 		MainCameraMovement(immediateContext, &mainCamera, deltaTime, &window);
 		swapChain->Present(0, 0);

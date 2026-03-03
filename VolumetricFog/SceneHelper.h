@@ -107,6 +107,14 @@ struct FroxelCameraData
 	float padding;
 };
 
+struct FroxelData
+{
+	int useFroxelFog;
+	float nearZ;
+	float farZ;
+	float padding;
+};
+
 void CreateMainCamera(ID3D11DeviceContext* context, ID3D11Device*& device, MainCamera* mainCamera, HWND* window);
 
 void CreateInputLayout(ID3D11Device*& device, InputLayoutD3D11& inputLayout,
@@ -152,4 +160,4 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 	ConstantBufferD3D11 *rayConstData, UINT totalSpotLights);
 
 void SetupFroxelVolFog(ID3D11Device *&device, ConstantBufferD3D11 *volFogCamDataCB, MainCamera *mainCamera, UINT totalSpotLights,
-	ID3D11Texture3D *&froxelTexture, ID3D11UnorderedAccessView *&froxelUAV);
+	ID3D11Texture3D *&froxelTexture, ID3D11UnorderedAccessView *&froxelUAV, ConstantBufferD3D11 *froxelDataCB);
