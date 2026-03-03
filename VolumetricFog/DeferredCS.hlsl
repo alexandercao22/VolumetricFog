@@ -42,6 +42,8 @@ cbuffer constantBuffer : register(b1)
     float fullLight;
     float shadows;
     bool useFroxelFog;
+    float nearZ;
+    float farZ;
 }
 
 float3 addSpotLight(SpotLightBuffer light, float3 position, float3 colour, float3 normal, float3 specular)
@@ -153,11 +155,22 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
     if (useFroxelFog)
     {
-        float depth = depthGBuffer[DTid.xy];
+        float depth = depthGBuffer[DTid.xy].r;
         
+        // Convert depth to linear view-space depth
+        float projA = farZ / (farZ - nearZ);
+        float projB = (-farZ * nearZ) / (farZ - nearZ);
+        float z = max((projB / (depth - projA)), nearZ);
         
-        float3 volumeTexCoord;
-        float4 fogData = froxelFogUAV.SampleLevel(shadowMapSampler, volumeTexCoord, 0);
+        // Convert linear depth to slice
+        float slice = log2(z / nearZ) / log2(farZ / nearZ);
+        
+        uint2 dimensions;
+        backBufferUAV.GetDimensions(dimensions.x, dimensions.y);
+        float2 screenUV = (DTid.xy + 0.5f) / dimensions.xy; // Correct?
+        
+        float3 volumeTexCoord = float3(screenUV, slice);
+        float4 fogData = froxelFogUAV.SampleLevel(shadowMapSampler, volumeTexCoord, 0); // Maybe use different sampler
         
         result = (result * fogData.a) + fogData.rgb;
     }
