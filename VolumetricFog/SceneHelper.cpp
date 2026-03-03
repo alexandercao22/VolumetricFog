@@ -464,7 +464,7 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 		}
 
 		FroxelData froxelData;
-		froxelData.useFroxelFog = useFroxelFog;
+		froxelData.useFroxelFog = useFroxelFog && renderFog;
 		froxelData.nearZ = mainCamera->GetMatrixInfo().nearZ;
 		froxelData.farZ = mainCamera->GetMatrixInfo().farZ;
 		froxelDataCB->UpdateBuffer(context, &froxelData);
