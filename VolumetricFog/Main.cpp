@@ -179,6 +179,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	SetupRayMarchingVolFog(device, &rayConstBuffer, &mainCamera, &rayConstData, totalSpotLights);
 
 	// Volumetric fog froxel-based
+	ShaderD3D11 volFogFroxelPropertyCS(device, ShaderType::COMPUTE_SHADER, L"VolumetricFoxFroxelAccumulation.cso");
 	ShaderD3D11 volFogFroxelLightCS(device, ShaderType::COMPUTE_SHADER, L"VolumetricFogFroxelLight.cso");
 	ConstantBufferD3D11 volFogCamDataCB;
 	SetupFroxelVolFog(device, &volFogCamDataCB, &mainCamera, totalSpotLights);
