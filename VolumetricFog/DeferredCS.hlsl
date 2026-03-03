@@ -30,6 +30,9 @@ sampler shadowMapSampler : register(s0);
 StructuredBuffer<DirectionalLightBuffer> directionalLight : register(t7);
 Texture2DArray<float> dirShadowMaps : register(t8);
 
+Texture2D<float4> depthGBuffer : register(t9);
+Texture3D<float4> froxelFogUAV : register(u10); // For froxel fog
+
 #define SHADOW_EPSILON 0.0001f
 
 cbuffer constantBuffer : register(b1)
@@ -38,6 +41,7 @@ cbuffer constantBuffer : register(b1)
     uint totalSpotLights;
     float fullLight;
     float shadows;
+    bool useFroxelFog;
 }
 
 float3 addSpotLight(SpotLightBuffer light, float3 position, float3 colour, float3 normal, float3 specular)
@@ -145,6 +149,17 @@ void main( uint3 DTid : SV_DispatchThreadID )
                 result += spotColour;
             }
         }
+    }
+    
+    if (useFroxelFog)
+    {
+        float depth = depthGBuffer[DTid.xy];
+        
+        
+        float3 volumeTexCoord;
+        float4 fogData = froxelFogUAV.SampleLevel(shadowMapSampler, volumeTexCoord, 0);
+        
+        result = (result * fogData.a) + fogData.rgb;
     }
     
     backBufferUAV[DTid.xy] = float4(result, backBufferUAV[DTid.xy].w);
