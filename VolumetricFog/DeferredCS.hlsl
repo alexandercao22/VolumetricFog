@@ -31,7 +31,7 @@ StructuredBuffer<DirectionalLightBuffer> directionalLight : register(t7);
 Texture2DArray<float> dirShadowMaps : register(t8);
 
 Texture2D<float4> depthGBuffer : register(t9);
-Texture3D<float4> froxelFogUAV : register(u10); // For froxel fog
+Texture3D<float4> froxelFogUAV : register(t10); // For froxel fog
 
 #define SHADOW_EPSILON 0.0001f
 
