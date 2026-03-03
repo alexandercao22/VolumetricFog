@@ -1,11 +1,14 @@
 RWTexture3D<float4> input : register(u2);        // Input
 RWTexture3D<float4> output : register(u3); // Output
 
-cbuffer data : register(b9)
+cbuffer FroxelCameraCB : register(b9)
 {
-    float nearPlane;
-    float farPlane;
-}
+    float4x4 invView;
+    float nearZ;
+    float farZ;
+    uint totalSpotLights;
+    float _pad4;
+};
 
 [numthreads(8, 8, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
@@ -16,7 +19,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     // Bounds check?
     
     float4 accumulated = float4(0.0f, 0.0f, 0.0f, 1.0f); // 1.0f is transmittance
-    float currentZ = nearPlane;
+    float currentZ = nearZ;
     
     // Raymarching
     for (int i = 0; i < dimensions.z; i++)
@@ -28,7 +31,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
         float cellDensity = cellData.a;
         
         float nextSliceStart = float(cellCoord.z + 1) / float(dimensions.z);
-        float nextZ = nearPlane * pow(farPlane / nearPlane, nextSliceStart);
+        float nextZ = nearZ * pow(farZ / nearZ, nextSliceStart);
         float stepSize = nextZ - currentZ;
         currentZ = nextZ; // For next iteration
         

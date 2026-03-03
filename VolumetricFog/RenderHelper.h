@@ -57,8 +57,8 @@ void DeferredRendering(ID3D11DeviceContext *context, DepthBufferD3D11 *depthSten
 	ID3D11InputLayout *inputLayoutCulling, ShaderD3D11 *cullingVS, ShaderD3D11 *cullingPS, MeshD3D11 *frustumMesh,
 	ConstantBufferD3D11 *frustumCbuffer, QuadTree<MeshD3D11> *quadTree, DirectX::BoundingFrustum *cameraFrustum,
 	MeshD3D11 *meshBoundingBoxLines, ShaderD3D11 *volFogRayCS, ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData,
-	ShaderD3D11 *volFogFroxelLightCS, ID3D11UnorderedAccessView *&froxelUAV, ConstantBufferD3D11 *volFogCamDataCB,
-	ShaderD3D11 *volFogFroxelAccumulation, ConstantBufferD3D11 *froxelDataCB);
+	ShaderD3D11 *volFogFroxelLightCS, ID3D11UnorderedAccessView *&froxelUAV, ShaderD3D11 *volFogFroxelAccumulation,
+	ConstantBufferD3D11 *froxelRaysCB, ConstantBufferD3D11 *froxelDataCB, ConstantBufferD3D11 *froxelCamCB);
 
 void RenderParticles(ID3D11DeviceContext *context, StructuredBufferD3D11 *particleBuffer, ShaderD3D11 *particleCS,
 	ShaderD3D11 *particleVS, ShaderD3D11 *particleGS, ShaderD3D11 *particlePS,

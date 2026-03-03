@@ -2,13 +2,16 @@ RWTexture3D<float4> fogDataUAV : register(u1);
 
 #define SHADOW_EPSILON 0.0001f
 
-cbuffer FroxelCameraCB : register(b8)
+cbuffer FroxelRaysCB : register(b8)
 {
     float3 ray00; float _pad0;
     float3 ray10; float _pad1;
     float3 ray01; float _pad2;
     float3 ray11; float _pad3;
+};
 
+cbuffer FroxelCameraCB : register(b9)
+{
     float4x4 invView;
     float nearZ;
     float farZ;

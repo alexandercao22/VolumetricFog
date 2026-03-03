@@ -828,8 +828,9 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 	rayConstData->Initialize(device, sizeof(RayData), &rayData);
 }
 
-void SetupFroxelVolFog(ID3D11Device *&device, ConstantBufferD3D11 *volFogCamDataCB, MainCamera *mainCamera, UINT totalSpotLights,
-	ID3D11Texture3D *&froxelTexture, ID3D11UnorderedAccessView *&froxelUAV, ConstantBufferD3D11 *froxelDataCB)
+void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT totalSpotLights,
+	ConstantBufferD3D11 *froxelRaysCB, ConstantBufferD3D11 *froxelDataCB, ConstantBufferD3D11 *froxelCamCB,
+	ID3D11Texture3D *&froxelTexture, ID3D11UnorderedAccessView *&froxelUAV)
 {
 	MatrixInfo cameraMatrix = mainCamera->GetMatrixInfo();
 
@@ -851,24 +852,34 @@ void SetupFroxelVolFog(ID3D11Device *&device, ConstantBufferD3D11 *volFogCamData
 	r01.x /= cameraMatrix.farZ; r01.y /= cameraMatrix.farZ; r01.z = 1.0f;
 	r11.x /= cameraMatrix.farZ; r11.y /= cameraMatrix.farZ; r11.z = 1.0f;
 
-	FroxelCameraData froxelCameraData;
-	froxelCameraData.ray00 = r00;
-	froxelCameraData.ray10 = r10;
-	froxelCameraData.ray01 = r01;
-	froxelCameraData.ray11 = r11;
+	FroxelRays froxelRays;
+	froxelRays.ray00 = r00;
+	froxelRays.ray10 = r10;
+	froxelRays.ray01 = r01;
+	froxelRays.ray11 = r11;
 
-	froxelCameraData.nearZ = cameraMatrix.nearZ;
-	froxelCameraData.farZ = cameraMatrix.farZ;
+	froxelRaysCB->Initialize(device, sizeof(FroxelRays), &froxelRays);
+
+	FroxelCamera froxelCamera;
+	froxelCamera.nearZ = cameraMatrix.nearZ;
+	froxelCamera.farZ = cameraMatrix.farZ;
 
 	DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&mainCamera->GetPosition());
 	DirectX::XMVECTOR focusPos = DirectX::XMLoadFloat3(&mainCamera->GetForward());
 	DirectX::XMVECTOR upDir = DirectX::XMLoadFloat3(&mainCamera->GetUp());
-	froxelCameraData.invView = DirectX::XMMatrixLookAtLH(position, focusPos, upDir);
-	froxelCameraData.invView = DirectX::XMMatrixInverse(nullptr, froxelCameraData.invView);
+	froxelCamera.invView = DirectX::XMMatrixLookAtLH(position, focusPos, upDir);
+	froxelCamera.invView = DirectX::XMMatrixInverse(nullptr, froxelCamera.invView);
 
-	froxelCameraData.totalSpotLights = totalSpotLights;
+	froxelCamera.totalSpotLights = totalSpotLights;
 
-	volFogCamDataCB->Initialize(device, sizeof(FroxelCameraData), volFogCamDataCB);
+	froxelCamCB->Initialize(device, sizeof(FroxelCamera), &froxelCamera);
+
+	// Froxel data
+	FroxelData froxelData;
+	froxelData.useFroxelFog = 0;
+	froxelData.nearZ = mainCamera->GetMatrixInfo().nearZ;
+	froxelData.farZ = mainCamera->GetMatrixInfo().farZ;
+	froxelDataCB->Initialize(device, sizeof(FroxelData), &froxelData);
 
 	// Froxel texture 3D
 	D3D11_TEXTURE3D_DESC froxelDesc;
@@ -897,11 +908,4 @@ void SetupFroxelVolFog(ID3D11Device *&device, ConstantBufferD3D11 *volFogCamData
 	hr = device->CreateUnorderedAccessView(froxelTexture, &uavDesc, &uav);
 	if (FAILED(hr))
 		return;
-
-	// Froxel data
-	FroxelData froxelData;
-	froxelData.useFroxelFog = 0;
-	froxelData.nearZ = mainCamera->GetMatrixInfo().nearZ;
-	froxelData.farZ = mainCamera->GetMatrixInfo().farZ;
-	froxelDataCB->Initialize(device, sizeof(FroxelData), &froxelData);
 }
