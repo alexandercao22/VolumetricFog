@@ -828,7 +828,8 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 	rayConstData->Initialize(device, sizeof(RayData), &rayData);
 }
 
-void SetupFroxelVolFog(ID3D11Device *&device, ConstantBufferD3D11 *volFogCamDataCB, MainCamera *mainCamera, UINT totalSpotLights)
+void SetupFroxelVolFog(ID3D11Device *&device, ConstantBufferD3D11 *volFogCamDataCB, MainCamera *mainCamera, UINT totalSpotLights,
+	ID3D11Texture3D *&froxelTexture)
 {
 	MatrixInfo cameraMatrix = mainCamera->GetMatrixInfo();
 
@@ -868,4 +869,32 @@ void SetupFroxelVolFog(ID3D11Device *&device, ConstantBufferD3D11 *volFogCamData
 	froxelCameraData.totalSpotLights = totalSpotLights;
 
 	volFogCamDataCB->Initialize(device, sizeof(FroxelCameraData), volFogCamDataCB);
+
+	// Froxel texture 3D
+	D3D11_TEXTURE3D_DESC froxelDesc;
+	froxelDesc.Width = 160;
+	froxelDesc.Height = 90;
+	froxelDesc.Depth = 32;
+	froxelDesc.MipLevels = 1;
+	froxelDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;  // UAV-compatible format
+	froxelDesc.Usage = D3D11_USAGE_DEFAULT;
+	froxelDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
+	froxelDesc.CPUAccessFlags = 0;
+	froxelDesc.MiscFlags = 0;
+
+	HRESULT hr = device->CreateTexture3D(&froxelDesc, nullptr, &froxelTexture);
+	if (FAILED(hr))
+		return;
+
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+	uavDesc.Format = froxelDesc.Format;
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE3D;
+	uavDesc.Texture3D.MipSlice = 0;
+	uavDesc.Texture3D.FirstWSlice = 0;
+	uavDesc.Texture3D.WSize = froxelDesc.Depth;
+
+	ID3D11UnorderedAccessView *uav = nullptr;
+	hr = device->CreateUnorderedAccessView(froxelTexture, &uavDesc, &uav);
+	if (FAILED(hr))
+		return;
 }
