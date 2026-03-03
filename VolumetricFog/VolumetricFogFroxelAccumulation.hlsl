@@ -40,6 +40,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
         float3 scatteringIntegral = cellScattering * (1.0f - transmittance) / max(cellDensity, 0.00001f);
         accumulated.rgb += scatteringIntegral * accumulated.a;
         
-        froxelAccUAV[cellCoord] = accumulated;
+        froxelAccUAV[cellCoord] = accumulated; // Error: All black
     }
 }

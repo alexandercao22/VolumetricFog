@@ -113,8 +113,6 @@ float PhaseHG(float cosTheta, float g)
 [numthreads(8, 8, 4)] // UAV dimensions = 160, 90, 32. Dispatch(20, 12, 8)
 void main( uint3 DTid : SV_DispatchThreadID )
 {
-    froxelLightUAV[DTid] = 0;
-    
     float3 worldPos = FroxelToWorldPos(DTid);
     
     // Volumetric fog settings

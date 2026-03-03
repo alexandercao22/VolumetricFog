@@ -266,7 +266,7 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	MeshD3D11 *meshBoundingBoxLines, ShaderD3D11 *volFogRayCS, ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData,
 	ShaderD3D11 *volFogFroxelLightCS, ShaderD3D11 *volFogFroxelAccumulateCS,
 	ConstantBufferD3D11 *froxelRaysCB, ConstantBufferD3D11 *froxelDataCB, ConstantBufferD3D11 *froxelCamCB,
-	ID3D11UnorderedAccessView *&froxelLightUAV, ID3D11UnorderedAccessView *&froxelAccUAV,
+	ID3D11UnorderedAccessView *&froxelLightUAV, ID3D11UnorderedAccessView *&froxelAccUAV, ID3D11ShaderResourceView *&froxelAccSRV,
 	bool renderFog, bool useFroxelFog)
 {
 	context->RSSetViewports(1, &viewport);
@@ -320,36 +320,43 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	// Unbind RTV's
 	context->OMSetRenderTargets(NR_OF_GBUFFERS, nullRtv, nullptr);
 
+	// Froxel-based volumetric fog
 	if (renderFog && useFroxelFog)
 	{
 		// Bind froxel-based shaders
 		// Calculate froxel lighting
 		volFogFroxelLightCS->BindShader(context);
-		context->CSSetUnorderedAccessViews(1, 1, &froxelLightUAV, nullptr);
 		ID3D11Buffer *froxelRays = froxelRaysCB->GetBuffer();
 		ID3D11Buffer *froxelCam = froxelCamCB->GetBuffer();
 		context->CSSetConstantBuffers(8, 1, &froxelRays);
 		context->CSSetConstantBuffers(9, 1, &froxelCam);
+		context->CSSetUnorderedAccessViews(1, 1, &froxelLightUAV, nullptr);
 		context->Dispatch(20, 12, 8);
 
 		// Accumulate froxel data
 		volFogFroxelAccumulateCS->BindShader(context);
 		context->CSSetUnorderedAccessViews(2, 1, &froxelAccUAV, nullptr);
 		context->Dispatch(20, 12, 32); // 3D texture resolution (subject to change)
+
+		ID3D11UnorderedAccessView *nullUav = nullptr;
+		context->CSSetUnorderedAccessViews(1, 1, &nullUav, nullptr);
+		context->CSSetUnorderedAccessViews(2, 1, &nullUav, nullptr);
 	}
 
 	// Bind the compute shader, SRV's and UAV for the CS.
+	ID3D11ShaderResourceView *rayDepthSRV = depthStencil->GetSRV();
 	ID3D11Buffer *froxelData = froxelDataCB->GetBuffer();
 	context->CSSetConstantBuffers(2, 1, &froxelData);
 	deferredCS->BindShader(context);
 	context->CSSetShaderResources(2, NR_OF_GBUFFERS, srvArr);
+	context->CSSetShaderResources(9, 1, &rayDepthSRV);
+	context->CSSetShaderResources(10, 1, &froxelAccSRV);
 	context->CSSetUnorderedAccessViews(0, 1, &DRuav, nullptr);
 	context->Dispatch(240, 135, 1); // X = 1920 / 8 = 240, Y = 1080 / 8 = 135
 
+	// Ray-marching volumetric fog
 	if (renderFog && !useFroxelFog)
 	{
-		// Ray-marching volumetric fog
-		ID3D11ShaderResourceView *rayDepthSRV = depthStencil->GetSRV();
 		ID3D11Buffer *rayBuffer = rayConstBuffer->GetBuffer();
 		ID3D11Buffer *rayData = rayConstData->GetBuffer();
 		context->CSSetShaderResources(2, 1, &rayDepthSRV);

@@ -858,7 +858,8 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT totalSpotLights,
 	ConstantBufferD3D11 *froxelRaysCB, ConstantBufferD3D11 *froxelDataCB, ConstantBufferD3D11 *froxelCamCB,
 	ID3D11Texture3D *&froxelLightTexture, ID3D11UnorderedAccessView *&froxelLightUAV,
-	ID3D11Texture3D *&froxelAccTexture, ID3D11UnorderedAccessView *&froxelAccUAV)
+	ID3D11Texture3D *&froxelAccTexture, ID3D11UnorderedAccessView *&froxelAccUAV,
+	ID3D11ShaderResourceView *&froxelAccSRV)
 {
 	MatrixInfo cameraMatrix = mainCamera->GetMatrixInfo();
 
@@ -953,6 +954,19 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 	if (FAILED(hr))
 	{
 		std::cerr << "Failed to create 3D texture UAV" << std::endl;
+		return;
+	}
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Format = froxelDesc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
+	srvDesc.Texture3D.MipLevels = 1;
+	srvDesc.Texture3D.MostDetailedMip = 0;
+
+	hr = device->CreateShaderResourceView(froxelLightTexture, &srvDesc, &froxelAccSRV);
+	if (FAILED(hr))
+	{
+		std::cerr << "Failed to create 3D texture SRV" << std::endl;
 		return;
 	}
 }
