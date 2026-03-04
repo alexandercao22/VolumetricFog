@@ -190,6 +190,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ID3D11UnorderedAccessView *froxelAccUAV = nullptr;
 	ID3D11ShaderResourceView* froxelLightSRV = nullptr;
 	ID3D11ShaderResourceView* froxelAccSRV = nullptr;
+	SamplerD3D11 froxelSampler(device, D3D11_TEXTURE_ADDRESS_CLAMP, borderColour);
 	SetupFroxelVolFog(device, &mainCamera, totalSpotLights, &froxelRaysCB, &froxelDataCB, &froxelCamCB,
 		froxelLightTexture, froxelLightUAV, froxelLightSRV, froxelAccTexture, froxelAccUAV, froxelAccSRV);
 	
@@ -238,7 +239,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			cullingInputLayout.GetInputLayout(), &cullingVS, &cullingPS, &frustumMesh, &frustumCbuffer,
 			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS, &rayConstBuffer, &rayConstData,
 			&volFogFroxelLightCS, &volFogFroxelAccumulateCS, &froxelRaysCB, &froxelDataCB, &froxelCamCB, 
-			froxelLightUAV, froxelLightSRV, froxelAccUAV, froxelAccSRV, renderFog, useFroxelFog);
+			froxelLightUAV, froxelLightSRV, froxelAccUAV, froxelAccSRV, &froxelSampler, renderFog, useFroxelFog);
 
 		MainCameraMovement(immediateContext, &mainCamera, deltaTime, &window);
 		swapChain->Present(0, 0);

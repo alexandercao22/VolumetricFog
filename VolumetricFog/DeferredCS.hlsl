@@ -32,6 +32,7 @@ Texture2DArray<float> dirShadowMaps : register(t8);
 
 Texture2D<float4> depthGBuffer : register(t9);
 Texture3D<float4> froxelFogSRV : register(t10); // For froxel fog
+sampler froxelSampler : register(s1);
 
 #define SHADOW_EPSILON 0.0001f
 
@@ -172,9 +173,9 @@ void main( uint3 DTid : SV_DispatchThreadID )
         float2 screenUV = (DTid.xy + 0.5f) / dimensions.xy; // Correct?
         
         float3 volumeTexCoord = float3(screenUV, slice);
-        float4 fogData = froxelFogSRV.SampleLevel(shadowMapSampler, volumeTexCoord, 0); // Maybe use different sampler
+        float4 fogData = froxelFogSRV.SampleLevel(froxelSampler, volumeTexCoord, 0); // Maybe use different sampler
         
-        result = (result * fogData.a) + fogData.rgb;
+        result += (result * fogData.a) + fogData.rgb;
     }
     
     backBufferUAV[DTid.xy] = float4(result, backBufferUAV[DTid.xy].w);
