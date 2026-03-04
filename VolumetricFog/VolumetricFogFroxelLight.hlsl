@@ -61,7 +61,7 @@ float3 FroxelToWorldPos(uint3 id)
     
     float3 viewPos = ray * z;
     
-    return mul(float4(viewPos, 1.0f), invViewProj).xyz;
+    return mul(float4(viewPos, z), invViewProj).xyz;
 }
 
 bool IsSampledPosShadowed(float3 samplePos, matrix lightViewProj, Texture2DArray<float> shadowMap, int index)
