@@ -95,7 +95,7 @@ struct RayData
 
 struct FroxelData
 {
-	DirectX::XMMATRIX viewMatrix;
+	DirectX::XMFLOAT4X4 viewMatrix;
 	int useFroxelFog;
 	float nearZ;
 	float farZ;

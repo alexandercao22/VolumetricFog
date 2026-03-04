@@ -46,7 +46,7 @@ cbuffer constantBuffer : register(b1)
 
 cbuffer froxelData : register(b2)
 {
-    matrix viewMatrix;
+    float4x4 viewMatrix;
     int useFroxelFog;
     float nearZ;
     float farZ;

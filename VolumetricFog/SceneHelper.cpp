@@ -907,7 +907,8 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 
 	// Froxel data
 	FroxelData froxelData;
-	froxelData.viewMatrix = view;
+	DirectX::XMMATRIX transposedView = DirectX::XMMatrixTranspose(view);
+	DirectX::XMStoreFloat4x4(&froxelData.viewMatrix, transposedView);
 	froxelData.useFroxelFog = 0;
 	froxelData.nearZ = mainCamera->GetMatrixInfo().nearZ;
 	froxelData.farZ = mainCamera->GetMatrixInfo().farZ;
