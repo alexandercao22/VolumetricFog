@@ -112,7 +112,7 @@ float PhaseHG(float cosTheta, float g)
     return (1 - g2) / (2 * pow(1 + g2 - 2 * g * cosTheta, 3.0f / 2.0f));
 }
 
-[numthreads(8, 8, 1)] // UAV dimensions = 160, 90, 32. Dispatch(20, 12, 8)
+[numthreads(8, 8, 4)] // UAV dimensions = 160, 90, 32. Dispatch(20, 12, 8)
 void main( uint3 DTid : SV_DispatchThreadID )
 {
     uint3 dimensions;
