@@ -278,14 +278,6 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	context->PSSetShaderResources(0, 1, &cubeTextureSRV);
 	context->PSSetSamplers(0, 1, &cubeSamplerState);
 
-	// Set shadow components
-	ID3D11ShaderResourceView* spotShadowSRV = spotLights->GetShadowMapsSRV();
-	context->CSSetShaderResources(1, 1, &spotShadowSRV);
-	ID3D11ShaderResourceView* dirShadowSRV = directionLight->GetShadowMapsSRV();
-	context->CSSetShaderResources(8, 1, &dirShadowSRV);
-	ID3D11SamplerState* shadowMapSampler = shadowSampler->GetSamplerState();
-	context->CSSetSamplers(0, 1, &shadowMapSampler);
-
 	// Create RTV arrays and SRV arrays
 	ID3D11RenderTargetView** rtvArr = new ID3D11RenderTargetView*[NR_OF_GBUFFERS];
 	ID3D11ShaderResourceView** srvArr = new ID3D11ShaderResourceView*[NR_OF_GBUFFERS];
@@ -357,6 +349,17 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	context->CSSetShaderResources(9, 1, &rayDepthSRV);
 	context->CSSetShaderResources(10, 1, &froxelAccSRV);
 	context->CSSetUnorderedAccessViews(0, 1, &DRuav, nullptr);
+
+	// Set shadow components
+	ID3D11ShaderResourceView *spotShadowSRV = spotLights->GetShadowMapsSRV();
+	context->CSSetShaderResources(1, 1, &spotShadowSRV);
+	ID3D11ShaderResourceView *dirShadowSRV = directionLight->GetShadowMapsSRV();
+	context->CSSetShaderResources(8, 1, &dirShadowSRV);
+	ID3D11SamplerState *shadowMapSampler = shadowSampler->GetSamplerState();
+	context->CSSetSamplers(0, 1, &shadowMapSampler);
+	ID3D11SamplerState *froxelMapSampler = froxelSampler->GetSamplerState();
+	context->CSSetSamplers(1, 1, &froxelMapSampler);
+
 	context->Dispatch(240, 135, 1); // X = 1920 / 8 = 240, Y = 1080 / 8 = 135
 
 	// Ray-marching volumetric fog
