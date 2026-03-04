@@ -95,6 +95,7 @@ struct RayData
 
 struct FroxelData
 {
+	DirectX::XMMATRIX viewMatrix;
 	int useFroxelFog;
 	float nearZ;
 	float farZ;
@@ -112,6 +113,9 @@ struct FroxelRays
 struct FroxelCamera
 {
 	DirectX::XMMATRIX invView;
+	DirectX::XMMATRIX invViewProj;
+	DirectX::XMFLOAT3 cameraPos;
+	char padding[4];
 	float nearZ;
 	float farZ;
 	UINT totalSpotLights;
@@ -165,6 +169,6 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 
 void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT totalSpotLights,
 	ConstantBufferD3D11 *froxelRaysCB, ConstantBufferD3D11 *froxelDataCB, ConstantBufferD3D11 *froxelCamCB,
-	ID3D11Texture3D *&froxelLightTexture, ID3D11UnorderedAccessView *&froxelLightUAV,
+	ID3D11Texture3D *&froxelLightTexture, ID3D11UnorderedAccessView *&froxelLightUAV, ID3D11ShaderResourceView*& froxelLightSRV,
 	ID3D11Texture3D *&froxelAccTexture, ID3D11UnorderedAccessView *&froxelAccUAV,
 	ID3D11ShaderResourceView *&froxelAccSRV);

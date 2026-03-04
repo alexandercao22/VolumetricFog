@@ -188,9 +188,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ID3D11Texture3D *froxelAccTexture;
 	ID3D11UnorderedAccessView *froxelLightUAV = nullptr;
 	ID3D11UnorderedAccessView *froxelAccUAV = nullptr;
-	ID3D11ShaderResourceView *froxelAccSRV = nullptr;
+	ID3D11ShaderResourceView* froxelLightSRV = nullptr;
+	ID3D11ShaderResourceView* froxelAccSRV = nullptr;
 	SetupFroxelVolFog(device, &mainCamera, totalSpotLights, &froxelRaysCB, &froxelDataCB, &froxelCamCB,
-		froxelLightTexture, froxelLightUAV, froxelAccTexture, froxelAccUAV, froxelAccSRV);
+		froxelLightTexture, froxelLightUAV, froxelLightSRV, froxelAccTexture, froxelAccUAV, froxelAccSRV);
 	
 	bool renderFog = true;
 	bool useFroxelFog = false;
@@ -237,7 +238,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			cullingInputLayout.GetInputLayout(), &cullingVS, &cullingPS, &frustumMesh, &frustumCbuffer,
 			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS, &rayConstBuffer, &rayConstData,
 			&volFogFroxelLightCS, &volFogFroxelAccumulateCS, &froxelRaysCB, &froxelDataCB, &froxelCamCB, 
-			froxelLightUAV, froxelAccUAV, froxelAccSRV, renderFog, useFroxelFog);
+			froxelLightUAV, froxelLightSRV, froxelAccUAV, froxelAccSRV, renderFog, useFroxelFog);
 
 		MainCameraMovement(immediateContext, &mainCamera, deltaTime, &window);
 		swapChain->Present(0, 0);

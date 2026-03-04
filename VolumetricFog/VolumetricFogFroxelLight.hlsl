@@ -13,6 +13,8 @@ cbuffer FroxelRaysCB : register(b8)
 cbuffer FroxelCameraCB : register(b9)
 {
     float4x4 invView;
+    float4x4 invViewProj;
+    float4 cameraPos;
     float nearZ;
     float farZ;
     uint totalSpotLights;
@@ -59,7 +61,7 @@ float3 FroxelToWorldPos(uint3 id)
     
     float3 viewPos = ray * z;
     
-    return mul(float4(viewPos, 1.0f), invView).xyz;
+    return mul(float4(viewPos, 1.0f), invViewProj).xyz;
 }
 
 bool IsSampledPosShadowed(float3 samplePos, matrix lightViewProj, Texture2DArray<float> shadowMap, int index)
@@ -110,23 +112,32 @@ float PhaseHG(float cosTheta, float g)
     return (1 - g2) / (2 * pow(1 + g2 - 2 * g * cosTheta, 3.0f / 2.0f));
 }
 
-[numthreads(8, 8, 4)] // UAV dimensions = 160, 90, 32. Dispatch(20, 12, 8)
+[numthreads(8, 8, 1)] // UAV dimensions = 160, 90, 32. Dispatch(20, 12, 8)
 void main( uint3 DTid : SV_DispatchThreadID )
 {
+    uint3 dimensions;
+    froxelLightUAV.GetDimensions(dimensions.x, dimensions.y, dimensions.z);
+    if (DTid.x >= dimensions.x || DTid.y >= dimensions.y || DTid.z >= dimensions.z)
+    {
+        return;
+    }
     float3 worldPos = FroxelToWorldPos(DTid);
     
     // Volumetric fog settings
     float3 fogColor = float3(1.0f, 1.0f, 1.0f);
-    float density = 0.5f;
-    float scattering = fogColor * density;
+    float density = 0.1f;
+    float scattering = 0.5f;
+    
+    float4 result = float4(0.0f, 0.0f, 0.0f, density);
+    float3 viewDir = normalize(worldPos - cameraPos.xyz);
     
     // Directional light
     bool isShadowed = IsSampledPosShadowed(worldPos, directionalLight[0].vpMatrix, dirShadowMaps, 0);
     if (!isShadowed)
     {
         float3 toLight = normalize(directionalLight[0].direction - worldPos);
-        float RdotL = CalculateRdotL(-float3(DTid), toLight);
-        froxelLightUAV[DTid] += float4(directionalLight[0].colour * PhaseHG(RdotL, scattering), 1.0f);
+        float RdotL = CalculateRdotL(-viewDir, toLight);
+        result += float4(directionalLight[0].colour * PhaseHG(RdotL, scattering), 0.0f);
     }
     
     // Spot lights
@@ -136,9 +147,13 @@ void main( uint3 DTid : SV_DispatchThreadID )
         if (!isShadowed)
         {
             float3 toLight = normalize(spotLights[i].direction - worldPos);
-            float RdotL = CalculateRdotL(-float3(DTid), toLight);
+            float RdotL = CalculateRdotL(-viewDir, toLight);
             float attenuation = abs(CalculateAttenuation(spotLights[i], worldPos));
-            froxelLightUAV[DTid] += float4(spotLights[i].colour * attenuation * PhaseHG(RdotL, scattering), 1.0f);
+            result += float4(spotLights[i].colour * attenuation * PhaseHG(RdotL, scattering), 0.0f);
         }
     }
+    
+    result.rgb *= fogColor * density;
+    
+    froxelLightUAV[DTid] = result;
 }

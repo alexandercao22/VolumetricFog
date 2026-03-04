@@ -1,5 +1,5 @@
-RWTexture3D<float4> froxelLightUAV : register(u1); // Input
-RWTexture3D<float4> froxelAccUAV : register(u2); // Output
+Texture3D<float4> froxelLightSRV : register(t1); // Input
+RWTexture3D<float4> froxelAccUAV : register(u1); // Output
 
 cbuffer FroxelCameraCB : register(b9)
 {
@@ -26,7 +26,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     {
         uint3 cellCoord = uint3(DTid.xy, i);
         
-        float4 cellData = froxelLightUAV[cellCoord];
+        float4 cellData = froxelLightSRV[cellCoord];
         float3 cellScattering = cellData.xyz;
         float cellDensity = cellData.a;
         
@@ -39,7 +39,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
         
         float3 scatteringIntegral = cellScattering * (1.0f - transmittance) / max(cellDensity, 0.00001f);
         accumulated.rgb += scatteringIntegral * accumulated.a;
+        accumulated.a *= transmittance;
         
-        froxelAccUAV[cellCoord] = accumulated; // Error: All black
+        froxelAccUAV[cellCoord] = accumulated;
     }
 }

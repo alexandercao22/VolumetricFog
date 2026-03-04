@@ -31,7 +31,7 @@ StructuredBuffer<DirectionalLightBuffer> directionalLight : register(t7);
 Texture2DArray<float> dirShadowMaps : register(t8);
 
 Texture2D<float4> depthGBuffer : register(t9);
-Texture3D<float4> froxelFogUAV : register(t10); // For froxel fog
+Texture3D<float4> froxelFogSRV : register(t10); // For froxel fog
 
 #define SHADOW_EPSILON 0.0001f
 
@@ -45,6 +45,7 @@ cbuffer constantBuffer : register(b1)
 
 cbuffer froxelData : register(b2)
 {
+    matrix viewMatrix;
     int useFroxelFog;
     float nearZ;
     float farZ;
@@ -158,23 +159,20 @@ void main( uint3 DTid : SV_DispatchThreadID )
     }
     
     if (useFroxelFog)
-    {
-        float depth = depthGBuffer[DTid.xy].r;
-        
-        // Convert depth to linear view-space depth
-        float projA = farZ / (farZ - nearZ);
-        float projB = (-farZ * nearZ) / (farZ - nearZ);
-        float z = max((projB / (depth - projA)), nearZ);
+    {  
+        float viewZ = mul(float4(position, 1.0f), viewMatrix).z;
+        float clampedZ = max(viewZ, nearZ);
         
         // Convert linear depth to slice
-        float slice = log2(z / nearZ) / log2(farZ / nearZ);
+        float slice = log2(clampedZ / nearZ) / log2(farZ / nearZ);
+        slice = saturate(slice);
         
         uint2 dimensions;
         backBufferUAV.GetDimensions(dimensions.x, dimensions.y);
         float2 screenUV = (DTid.xy + 0.5f) / dimensions.xy; // Correct?
         
         float3 volumeTexCoord = float3(screenUV, slice);
-        float4 fogData = froxelFogUAV.SampleLevel(shadowMapSampler, volumeTexCoord, 0); // Maybe use different sampler
+        float4 fogData = froxelFogSRV.SampleLevel(shadowMapSampler, volumeTexCoord, 0); // Maybe use different sampler
         
         result = (result * fogData.a) + fogData.rgb;
     }

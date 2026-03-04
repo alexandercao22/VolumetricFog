@@ -857,9 +857,8 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 
 void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT totalSpotLights,
 	ConstantBufferD3D11 *froxelRaysCB, ConstantBufferD3D11 *froxelDataCB, ConstantBufferD3D11 *froxelCamCB,
-	ID3D11Texture3D *&froxelLightTexture, ID3D11UnorderedAccessView *&froxelLightUAV,
-	ID3D11Texture3D *&froxelAccTexture, ID3D11UnorderedAccessView *&froxelAccUAV,
-	ID3D11ShaderResourceView *&froxelAccSRV)
+	ID3D11Texture3D *&froxelLightTexture, ID3D11UnorderedAccessView *&froxelLightUAV, ID3D11ShaderResourceView*& froxelLightSRV,
+	ID3D11Texture3D *&froxelAccTexture, ID3D11UnorderedAccessView *&froxelAccUAV, ID3D11ShaderResourceView *&froxelAccSRV)
 {
 	MatrixInfo cameraMatrix = mainCamera->GetMatrixInfo();
 
@@ -896,8 +895,11 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 	DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&mainCamera->GetPosition());
 	DirectX::XMVECTOR focusPos = DirectX::XMLoadFloat3(&mainCamera->GetForward());
 	DirectX::XMVECTOR upDir = DirectX::XMLoadFloat3(&mainCamera->GetUp());
-	froxelCamera.invView = DirectX::XMMatrixLookAtLH(position, focusPos, upDir);
-	froxelCamera.invView = DirectX::XMMatrixInverse(nullptr, froxelCamera.invView);
+	DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(position, focusPos, upDir);
+	froxelCamera.invView = DirectX::XMMatrixInverse(nullptr, view);
+	DirectX::XMFLOAT4X4 viewProj = mainCamera->GetViewProjectionMatrix();
+	DirectX::XMMATRIX viewProjMat = DirectX::XMLoadFloat4x4(&viewProj);
+	froxelCamera.invViewProj = DirectX::XMMatrixInverse(nullptr, viewProjMat);
 
 	froxelCamera.totalSpotLights = totalSpotLights;
 
@@ -905,6 +907,7 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 
 	// Froxel data
 	FroxelData froxelData;
+	froxelData.viewMatrix = view;
 	froxelData.useFroxelFog = 0;
 	froxelData.nearZ = mainCamera->GetMatrixInfo().nearZ;
 	froxelData.farZ = mainCamera->GetMatrixInfo().farZ;
@@ -962,6 +965,12 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
 	srvDesc.Texture3D.MipLevels = 1;
 	srvDesc.Texture3D.MostDetailedMip = 0;
+
+	hr = device->CreateShaderResourceView(froxelLightTexture, &srvDesc, &froxelLightSRV);
+	if (FAILED(hr)) {
+		std::cerr << "Failed to create 3D texture SRV" << std::endl;
+		return;
+	}
 
 	hr = device->CreateShaderResourceView(froxelAccTexture, &srvDesc, &froxelAccSRV);
 	if (FAILED(hr))
