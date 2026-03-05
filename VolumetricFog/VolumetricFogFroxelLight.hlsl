@@ -54,14 +54,14 @@ float3 FroxelToWorldPos(uint3 id)
 
     float3 rayX0 = lerp(ray00, ray10, uv.x); // Top rays in x axis
     float3 rayX1 = lerp(ray01, ray11, uv.x); // Bottom rays in x axis
-    float3 ray = normalize(lerp(rayX0, rayX1, uv.y)); // Ray y axis
+    float3 ray = lerp(rayX0, rayX1, uv.y); // Ray y axis
     
     float slice = (id.z + 0.5f) / dimension.z;
     float z = nearZ * pow(farZ / nearZ, slice);
     
-    float3 viewPos = ray * z;
+    float3 viewPos = ray * (z / ray.z);
     
-    return mul(float4(viewPos, z), invViewProj).xyz;
+    return mul(float4(viewPos, 1.0f), invView).xyz;
 }
 
 bool IsSampledPosShadowed(float3 samplePos, matrix lightViewProj, Texture2DArray<float> shadowMap, int index)
