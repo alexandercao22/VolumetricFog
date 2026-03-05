@@ -324,7 +324,7 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 		context->CSSetConstantBuffers(8, 1, &froxelRays);
 		context->CSSetConstantBuffers(9, 1, &froxelCam);
 		context->CSSetUnorderedAccessViews(1, 1, &froxelLightUAV, nullptr);
-		context->Dispatch(20, 12, 8);
+		context->Dispatch(20*5, 12*5, 8);
 
 		ID3D11UnorderedAccessView* nullUav = nullptr;
 		context->CSSetUnorderedAccessViews(1, 1, &nullUav, nullptr);
@@ -333,7 +333,7 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 		volFogFroxelAccumulateCS->BindShader(context);
 		context->CSSetShaderResources(1, 1, &froxelLightSRV);
 		context->CSSetUnorderedAccessViews(1, 1, &froxelAccUAV, nullptr);
-		context->Dispatch(20, 12, 1);
+		context->Dispatch(20*5, 12*5, 1);
 
 		context->CSSetUnorderedAccessViews(1, 1, &nullUav, nullptr);
 		ID3D11ShaderResourceView* nullSrv = nullptr;
