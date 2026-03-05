@@ -144,7 +144,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
     float2 pixelCoords = DTid.xy;
     float distLimit = min(viewLength, maxDistance);
-    float t = time / max(0.01f, deltaTime);
+    float t = time / max(0.01f, deltaTime); // Should change this to frameCount from C++
     float distTravelled = IGN(pixelCoords, t) * noiseOffset;
     float transmittance = 1.0f;
     

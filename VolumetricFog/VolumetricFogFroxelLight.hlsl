@@ -116,6 +116,15 @@ float PhaseHG(float cosTheta, float g)
     return (1 - g2) / (2 * pow(1 + g2 - 2 * g * cosTheta, 3.0f / 2.0f));
 }
 
+// Add IGN function
+float IGN(float2 pixel, int frame)
+{
+    frame = frame % 64;
+    float x = float(pixel.x) + 5.588238f * float(frame);
+    float y = float(pixel.y) + 5.588238f * float(frame);
+    return frac(52.9829189f * frac(0.06711056f * float(x) + 0.00583715f * float(y)));
+}
+
 [numthreads(8, 8, 4)] // UAV dimensions = 160, 90, 32. Dispatch(20, 12, 8)
 void main( uint3 DTid : SV_DispatchThreadID )
 {
@@ -127,6 +136,13 @@ void main( uint3 DTid : SV_DispatchThreadID )
     }
     float3 worldPos = FroxelToWorldPos(DTid);
     
+    float3 nextWorldPos = FroxelToWorldPos(uint3(DTid.xy, DTid.z + 1));
+    float froxelDepth = distance(worldPos, nextWorldPos);
+    float t = time / max(0.0001f, deltaTime); // Should change this to frameCount from C++
+    float jitter = IGN(DTid.xy + DTid.z, t) - 0.5f; // Range -0.5 to 0.5
+    float3 viewDir = normalize(worldPos - cameraPos.xyz);
+    float3 shadowPos = worldPos + (viewDir * jitter * froxelDepth);
+    
     // Volumetric fog settings
     float3 fogColor = float3(1.0f, 1.0f, 1.0f);
     float density = 0.1f;
@@ -136,7 +152,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float3 rayDir = normalize(worldPos - cameraPos.xyz);
     
     // Directional light
-    bool isShadowed = IsSampledPosShadowed(worldPos, directionalLight[0].vpMatrix, dirShadowMaps, 0);
+    bool isShadowed = IsSampledPosShadowed(shadowPos, directionalLight[0].vpMatrix, dirShadowMaps, 0);
     if (!isShadowed)
     {
         float3 toLight = normalize(-directionalLight[0].direction);
@@ -147,7 +163,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     // Spot lights
     for (int i = 0; i < totalSpotLights; i++)
     {
-        isShadowed = IsSampledPosShadowed(worldPos, spotLights[i].vpMatrix, spotShadowMaps, i);
+        isShadowed = IsSampledPosShadowed(shadowPos, spotLights[i].vpMatrix, spotShadowMaps, i);
         if (!isShadowed)
         {
             float3 toLight = normalize(spotLights[i].position - worldPos);
