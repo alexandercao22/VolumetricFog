@@ -13,7 +13,6 @@ cbuffer FroxelRaysCB : register(b8)
 cbuffer FroxelCameraCB : register(b9)
 {
     float4x4 invView;
-    float4x4 invViewProj;
     float4 cameraPos;
     float nearZ;
     float farZ;

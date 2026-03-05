@@ -113,7 +113,6 @@ struct FroxelRays
 struct FroxelCamera
 {
 	DirectX::XMMATRIX invView;
-	DirectX::XMMATRIX invViewProj;
 	DirectX::XMFLOAT3 cameraPos;
 	char padding[4];
 	float nearZ;

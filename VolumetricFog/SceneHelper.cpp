@@ -621,9 +621,6 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	froxelCamera.invView = DirectX::XMMatrixInverse(nullptr, view);
 	//froxelCamera.invView = DirectX::XMMatrixTranspose(froxelCamera.invView);
 
-	DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovLH(camMat.fovAngleY, camMat.aspectRatio, camMat.nearZ, camMat.farZ);
-	froxelCamera.invViewProj = DirectX::XMMatrixInverse(nullptr, proj);
-
 	DirectX::XMStoreFloat3(&froxelCamera.cameraPos, position);
 	froxelCamera.totalSpotLights = totalSpotLights;
 	froxelCamCB->UpdateBuffer(context, &froxelCamera);
@@ -927,9 +924,6 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 	DirectX::XMVECTOR upDir = DirectX::XMLoadFloat3(&mainCamera->GetUp());
 	DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(position, focusPos, upDir);
 	froxelCamera.invView = DirectX::XMMatrixInverse(nullptr, view);
-	DirectX::XMFLOAT4X4 viewProj = mainCamera->GetViewProjectionMatrix();
-	DirectX::XMMATRIX viewProjMat = DirectX::XMLoadFloat4x4(&viewProj);
-	froxelCamera.invViewProj = DirectX::XMMatrixInverse(nullptr, viewProjMat);
 
 	DirectX::XMStoreFloat3(&froxelCamera.cameraPos, position);
 	froxelCamera.totalSpotLights = totalSpotLights;

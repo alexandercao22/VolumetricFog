@@ -4,7 +4,6 @@ RWTexture3D<float4> froxelAccUAV : register(u1); // Output
 cbuffer FroxelCameraCB : register(b9)
 {
     float4x4 invView;
-    float4x4 invViewProj;
     float4 cameraPos;
     float nearZ;
     float farZ;
