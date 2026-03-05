@@ -99,10 +99,9 @@ float CalculateAttenuation(SpotLightBuffer light, float3 samplePos)
     return 0.0f; // Outside light cone
 }
 
-float CalculateRdotL(float3 rayDir, float3 lightDir)
+float CalculateRdotL(float3 rayDir, float3 toLight)
 {
-    lightDir = normalize(lightDir); // Direction of directional light
-    return dot(rayDir, lightDir);
+    return dot(rayDir, toLight);
 }
 
 float PhaseHG(float cosTheta, float g)
@@ -129,14 +128,14 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float scattering = 0.5f;
     
     float4 result = float4(0.0f, 0.0f, 0.0f, density);
-    float3 viewDir = normalize(worldPos - cameraPos.xyz);
+    float3 rayDir = normalize(worldPos - cameraPos.xyz);
     
     // Directional light
     bool isShadowed = IsSampledPosShadowed(worldPos, directionalLight[0].vpMatrix, dirShadowMaps, 0);
     if (!isShadowed)
     {
-        float3 toLight = normalize(directionalLight[0].direction - worldPos);
-        float RdotL = CalculateRdotL(-viewDir, toLight);
+        float3 toLight = normalize(-directionalLight[0].direction);
+        float RdotL = CalculateRdotL(rayDir, toLight);
         result += float4(directionalLight[0].colour * PhaseHG(RdotL, scattering), 0.0f);
     }
     
@@ -146,8 +145,8 @@ void main( uint3 DTid : SV_DispatchThreadID )
         isShadowed = IsSampledPosShadowed(worldPos, spotLights[i].vpMatrix, spotShadowMaps, i);
         if (!isShadowed)
         {
-            float3 toLight = normalize(spotLights[i].direction - worldPos);
-            float RdotL = CalculateRdotL(-viewDir, toLight);
+            float3 toLight = normalize(spotLights[i].position - worldPos);
+            float RdotL = CalculateRdotL(rayDir, toLight);
             float attenuation = abs(CalculateAttenuation(spotLights[i], worldPos));
             result += float4(spotLights[i].colour * attenuation * PhaseHG(RdotL, scattering), 0.0f);
         }

@@ -106,10 +106,9 @@ float CalculateAttenuation(SpotLightBuffer light, float3 samplePos)
     return 0.0f; // Outside light cone
 }
 
-float CalculateRdotL(float3 rayDir, float3 lightDir)
+float CalculateRdotL(float3 rayDir, float3 toLight)
 {
-    lightDir = normalize(lightDir); // Direction of directional light
-    return dot(rayDir, lightDir);
+    return dot(rayDir, toLight);
 }
 
 float3 NormalizeByMaxComponent(float3 v)
@@ -161,8 +160,8 @@ void main( uint3 DTid : SV_DispatchThreadID )
         bool isShadowed = IsSampledPosShadowed(sampleWorldPos, directionalLight[0].vpMatrix, dirShadowMaps, 0);
         if (density > 0.0f && !isShadowed)
         {
-            float3 toLight = normalize(directionalLight[0].direction - sampleWorldPos);
-            float RdotL = CalculateRdotL(-rayDir, toLight);
+            float3 toLight = normalize(-directionalLight[0].direction);
+            float RdotL = CalculateRdotL(rayDir, toLight);
             fogColor.rgb += directionalLight[0].colour * PhaseHG(RdotL, scattering) * density * stepSize;
             transmittance *= exp(-density * stepSize);
         }
@@ -173,8 +172,8 @@ void main( uint3 DTid : SV_DispatchThreadID )
             isShadowed = IsSampledPosShadowed(sampleWorldPos, spotLights[i].vpMatrix, spotShadowMaps, i);
             if (density > 0.0f && !isShadowed)
             {
-                float3 toLight = normalize(spotLights[i].direction - sampleWorldPos);
-                float RdotL = CalculateRdotL(-rayDir, toLight);
+                float3 toLight = normalize(spotLights[i].position - worldPos);
+                float RdotL = CalculateRdotL(rayDir, toLight);
                 float attenuation = abs(CalculateAttenuation(spotLights[i], sampleWorldPos));
                 fogColor.rgb += spotLights[i].colour * attenuation * PhaseHG(RdotL, scattering) * density * stepSize;
                 transmittance *= exp(-density * stepSize);
