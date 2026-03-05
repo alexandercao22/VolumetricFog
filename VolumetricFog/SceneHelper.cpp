@@ -473,8 +473,8 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 		DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(position, focusPos, upDir);
 
 		FroxelData froxelData;
-		DirectX::XMMATRIX transposedView = DirectX::XMMatrixTranspose(view);
-		DirectX::XMStoreFloat4x4(&froxelData.viewMatrix, transposedView);
+		view = DirectX::XMMatrixTranspose(view);
+		DirectX::XMStoreFloat4x4(&froxelData.viewMatrix, view);
 		froxelData.useFroxelFog = useFroxelFog && renderFog;
 		froxelData.nearZ = camMat.nearZ;
 		froxelData.farZ = camMat.farZ;
@@ -619,7 +619,7 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	DirectX::XMVECTOR upDir = DirectX::XMLoadFloat3(&camMat.up);
 	DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(position, focusPos, upDir);
 	froxelCamera.invView = DirectX::XMMatrixInverse(nullptr, view);
-	//froxelCamera.invView = DirectX::XMMatrixTranspose(froxelCamera.invView);
+	froxelCamera.invView = DirectX::XMMatrixTranspose(froxelCamera.invView);
 
 	DirectX::XMStoreFloat3(&froxelCamera.cameraPos, position);
 	froxelCamera.totalSpotLights = totalSpotLights;
@@ -919,7 +919,7 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 	froxelCamera.nearZ = cameraMatrix.nearZ;
 	froxelCamera.farZ = cameraMatrix.farZ;
 
-	DirectX::XMVECTOR position = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&mainCamera->GetPosition());
 	DirectX::XMVECTOR focusPos = DirectX::XMLoadFloat3(&mainCamera->GetForward());
 	DirectX::XMVECTOR upDir = DirectX::XMLoadFloat3(&mainCamera->GetUp());
 	DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(position, focusPos, upDir);
