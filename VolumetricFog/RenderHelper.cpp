@@ -321,10 +321,12 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 		volFogFroxelLightCS->BindShader(context);
 		ID3D11Buffer *froxelRays = froxelRaysCB->GetBuffer();
 		ID3D11Buffer *froxelCam = froxelCamCB->GetBuffer();
+		ID3D11Buffer *rayData = rayConstData->GetBuffer();
 		context->CSSetConstantBuffers(8, 1, &froxelRays);
 		context->CSSetConstantBuffers(9, 1, &froxelCam);
+		context->CSSetConstantBuffers(10, 1, &rayData);
 		context->CSSetUnorderedAccessViews(1, 1, &froxelLightUAV, nullptr);
-		context->Dispatch(20*5, 12*5, 8);
+		context->Dispatch(20*5, 12*5, 16);
 
 		ID3D11UnorderedAccessView* nullUav = nullptr;
 		context->CSSetUnorderedAccessViews(1, 1, &nullUav, nullptr);

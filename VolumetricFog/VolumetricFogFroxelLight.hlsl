@@ -20,6 +20,12 @@ cbuffer FroxelCameraCB : register(b9)
     float _pad4;
 };
 
+cbuffer data : register(b10)
+{
+    float time;
+    float deltaTime;
+}
+
 struct SpotLightBuffer
 {
     matrix vpMatrix;
