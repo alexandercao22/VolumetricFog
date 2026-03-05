@@ -894,10 +894,10 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 	float farX = cameraMatrix.farZ * tanHalfFovX;
 
 	// View-space far plane corners
-	DirectX::XMFLOAT3 r00 = DirectX::XMFLOAT3(-farX, -farY, cameraMatrix.farZ);
-	DirectX::XMFLOAT3 r10 = DirectX::XMFLOAT3(farX, -farY, cameraMatrix.farZ);
-	DirectX::XMFLOAT3 r01 = DirectX::XMFLOAT3(-farX, farY, cameraMatrix.farZ);
-	DirectX::XMFLOAT3 r11 = DirectX::XMFLOAT3(farX, farY, cameraMatrix.farZ);
+	DirectX::XMFLOAT3 r00 = DirectX::XMFLOAT3(-farX, farY, cameraMatrix.farZ); // Top left
+	DirectX::XMFLOAT3 r10 = DirectX::XMFLOAT3(-farX, -farY, cameraMatrix.farZ);	// Top right
+	DirectX::XMFLOAT3 r01 = DirectX::XMFLOAT3(farX, farY, cameraMatrix.farZ);	// Bottom left
+	DirectX::XMFLOAT3 r11 = DirectX::XMFLOAT3(farX, -farY, cameraMatrix.farZ);	// Bottom right
 
 	// Pre-divide so ray.z == 1
 	r00.x /= cameraMatrix.farZ; r00.y /= cameraMatrix.farZ; r00.z = 1.0f;

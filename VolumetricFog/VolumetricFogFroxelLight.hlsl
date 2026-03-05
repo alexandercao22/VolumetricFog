@@ -52,9 +52,9 @@ float3 FroxelToWorldPos(uint3 id)
     
     float2 uv = (id.xy + 0.5f) / dimension.xy;
 
-    float3 rayX0 = lerp(ray00, ray10, uv.x);
-    float3 rayX1 = lerp(ray01, ray11, uv.x);
-    float3 ray = lerp(rayX0, rayX1, uv.y);
+    float3 rayX0 = lerp(ray00, ray10, uv.x); // Top rays in x axis
+    float3 rayX1 = lerp(ray01, ray11, uv.x); // Bottom rays in x axis
+    float3 ray = normalize(lerp(rayX0, rayX1, uv.y)); // Ray y axis
     
     float slice = (id.z + 0.5f) / dimension.z;
     float z = nearZ * pow(farZ / nearZ, slice);
