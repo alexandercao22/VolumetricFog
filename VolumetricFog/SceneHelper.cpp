@@ -454,6 +454,7 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	ConstantBufferD3D11 *froxelDataCB, bool &renderFog, bool &useFroxelFog,
 	ConstantBufferD3D11 *froxelCamCB)
 {
+	mainCamera->UpdateMatrixInfo();
 	MatrixInfo camMat = mainCamera->GetMatrixInfo();
 	{
 		if (GetKeyState('G')) // Toggle fog mode
@@ -466,7 +467,8 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 		}
 
 		DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&camMat.position);
-		DirectX::XMVECTOR focusPos = DirectX::XMLoadFloat3(&camMat.forward);
+		DirectX::XMVECTOR forward = DirectX::XMLoadFloat3(&camMat.forward);
+		DirectX::XMVECTOR focusPos = DirectX::XMVectorAdd(position, forward);
 		DirectX::XMVECTOR upDir = DirectX::XMLoadFloat3(&camMat.up);
 		DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(position, focusPos, upDir);
 

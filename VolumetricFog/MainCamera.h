@@ -70,6 +70,7 @@ public:
 	const DirectX::XMFLOAT3& GetRight() const;
 	const DirectX::XMFLOAT3& GetUp() const;
 	MatrixInfo GetMatrixInfo();
+	void UpdateMatrixInfo();
 	DirectX::BoundingFrustum GetFrustum();
 
 	void SetPosition(DirectX::XMFLOAT3 setPosition);

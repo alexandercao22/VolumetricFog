@@ -166,6 +166,14 @@ MatrixInfo MainCamera::GetMatrixInfo()
 	return this->cameraInfo;
 }
 
+void MainCamera::UpdateMatrixInfo()
+{
+	cameraInfo.position = this->position;
+	cameraInfo.forward = this->forward;
+	cameraInfo.right = this->right;
+	cameraInfo.up = this->up;
+}
+
 DirectX::BoundingFrustum MainCamera::GetFrustum()
 {
 	return this->frustum;
