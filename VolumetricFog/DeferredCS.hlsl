@@ -175,7 +175,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
         float3 volumeTexCoord = float3(screenUV, slice);
         float4 fogData = froxelFogSRV.SampleLevel(froxelSampler, volumeTexCoord, 0); // Maybe use different sampler
         
-        result += (result * fogData.a) + fogData.rgb;
+        result = (result * fogData.a) + fogData.rgb;
     }
     
     backBufferUAV[DTid.xy] = float4(result, backBufferUAV[DTid.xy].w);
