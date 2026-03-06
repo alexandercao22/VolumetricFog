@@ -129,13 +129,12 @@ void main( uint3 DTid : SV_DispatchThreadID )
  
     float3 worldPos = ComputeWorldSpacePosition(uv, depth, viewProj);
     
-    //float3 viewDir = worldPos - camPos.xyz; // Does not work for some reason
-    float3 viewDir = worldPos - float3(0.0f, 0.0f, 0.0f);
+    float3 viewDir = worldPos;
     float viewLength = length(viewDir);
     float3 rayDir = normalize(viewDir);
 
     // Volumetric fog settings
-    float density = 0.02f;
+    float density = 0.04f;
     float maxDistance = 50.0f;
     float stepSize = 2.0f;
     float noiseOffset = 2.0f;
@@ -155,6 +154,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
             break;
         
         float3 sampleWorldPos = camPos.xyz + rayDir * distTravelled;
+        float3 fogSum = 0.0f;
         
         // Directional light
         bool isShadowed = IsSampledPosShadowed(sampleWorldPos, directionalLight[0].vpMatrix, dirShadowMaps, 0);
@@ -162,8 +162,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
         {
             float3 toLight = normalize(-directionalLight[0].direction);
             float RdotL = CalculateRdotL(rayDir, toLight);
-            fogColor.rgb += directionalLight[0].colour * PhaseHG(RdotL, scattering) * density * stepSize;
-            transmittance *= exp(-density * stepSize);
+            fogSum += directionalLight[0].colour * PhaseHG(RdotL, scattering);
         }
         
         // Spot lights
@@ -175,10 +174,11 @@ void main( uint3 DTid : SV_DispatchThreadID )
                 float3 toLight = normalize(spotLights[i].position - worldPos);
                 float RdotL = CalculateRdotL(rayDir, toLight);
                 float attenuation = abs(CalculateAttenuation(spotLights[i], sampleWorldPos));
-                fogColor.rgb += spotLights[i].colour * attenuation * PhaseHG(RdotL, scattering) * density * stepSize;
-                transmittance *= exp(-density * stepSize);
+                fogSum += spotLights[i].colour * attenuation * PhaseHG(RdotL, scattering);
             }
         }
+        fogColor.rgb += fogSum * density * stepSize;
+        transmittance *= exp(-density * stepSize);
         
         distTravelled += stepSize;
     }
