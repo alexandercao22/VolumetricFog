@@ -391,35 +391,57 @@ void SetupLights(ID3D11DeviceContext* context, ID3D11Device*& device, SpotLightC
 
 	SpotLightData::PerLightInfo perLightInfo;
 
-	perLightInfo.colour = { 1.0f, 0.0f, 0.0f };
-	perLightInfo.rotationX = PID4;
-	perLightInfo.rotationY = PI + PID4 / 2;
-	perLightInfo.outAngle = PID4 / 2;
-	perLightInfo.inAngle = PID4 / 4;
-	perLightInfo.projectionNearZ = 0.1f;
-	perLightInfo.projectionFarZ = 100.0f;
-	perLightInfo.initialPosition = { 0.0f, 10.0f, 10.0f };
-	spotLightData.perLightInfo.push_back(perLightInfo);
+	{
+		//perLightInfo.colour = { 1.0f, 0.0f, 0.0f };
+		//perLightInfo.rotationX = PID4;
+		//perLightInfo.rotationY = PI + PID4 / 2;
+		//perLightInfo.outAngle = PID4 / 2;
+		//perLightInfo.inAngle = PID4 / 4;
+		//perLightInfo.projectionNearZ = 0.1f;
+		//perLightInfo.projectionFarZ = 100.0f;
+		//perLightInfo.initialPosition = { 0.0f, 10.0f, 10.0f };
+		//spotLightData.perLightInfo.push_back(perLightInfo);
 
-	perLightInfo.colour = { 0.0f, 1.0f, 0.0f };
-	perLightInfo.rotationX = PID4;
-	perLightInfo.rotationY = PI;
-	perLightInfo.outAngle = PID4 / 2;
-	perLightInfo.inAngle = PID4 / 4;
-	perLightInfo.projectionNearZ = 0.1f;
-	perLightInfo.projectionFarZ = 100.0f;
-	perLightInfo.initialPosition = { 0.0f, 10.0f, 10.0f };
-	spotLightData.perLightInfo.push_back(perLightInfo);
+		//perLightInfo.colour = { 0.0f, 1.0f, 0.0f };
+		//perLightInfo.rotationX = PID4;
+		//perLightInfo.rotationY = PI;
+		//perLightInfo.outAngle = PID4 / 2;
+		//perLightInfo.inAngle = PID4 / 4;
+		//perLightInfo.projectionNearZ = 0.1f;
+		//perLightInfo.projectionFarZ = 100.0f;
+		//perLightInfo.initialPosition = { 0.0f, 10.0f, 10.0f };
+		//spotLightData.perLightInfo.push_back(perLightInfo);
 
-	perLightInfo.colour = { 0.0f, 0.0f, 1.0f };
-	perLightInfo.rotationX = PID4;
-	perLightInfo.rotationY = PI - PID4 / 2;
-	perLightInfo.outAngle = PID4 / 2;
-	perLightInfo.inAngle = PID4 / 4;
-	perLightInfo.projectionNearZ = 0.1f;
-	perLightInfo.projectionFarZ = 100.0f;
-	perLightInfo.initialPosition = { 0.0f, 10.0f, 10.0f };
-	spotLightData.perLightInfo.push_back(perLightInfo);
+		//perLightInfo.colour = { 0.0f, 0.0f, 1.0f };
+		//perLightInfo.rotationX = PID4;
+		//perLightInfo.rotationY = PI - PID4 / 2;
+		//perLightInfo.outAngle = PID4 / 2;
+		//perLightInfo.inAngle = PID4 / 4;
+		//perLightInfo.projectionNearZ = 0.1f;
+		//perLightInfo.projectionFarZ = 100.0f;
+		//perLightInfo.initialPosition = { 0.0f, 10.0f, 10.0f };
+		//spotLightData.perLightInfo.push_back(perLightInfo);
+	}
+
+	const UINT totalLights = 5;
+	const float radius = 10.0f;
+	for (int i = 0; i < totalLights; i++)
+	{
+		float angle = ((PI * i) / (float(totalLights) / 2));
+		perLightInfo.initialPosition = { cos(angle + PID2) * radius, 10.0f, sin(angle + PID2) * radius };
+
+		perLightInfo.rotationX = PID4;
+		perLightInfo.rotationY = PI - angle;
+
+		perLightInfo.colour = { 1.0f, 1.0f, 1.0f };
+
+		perLightInfo.outAngle = PID4 / 2;
+		perLightInfo.inAngle = PID4 / 4;
+		perLightInfo.projectionNearZ = 0.1f;
+		perLightInfo.projectionFarZ = 100.0f;
+
+		spotLightData.perLightInfo.push_back(perLightInfo);
+	}
 	
 	spotLights->Initialize(device, spotLightData);
 	
