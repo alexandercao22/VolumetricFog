@@ -472,7 +472,7 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	ConstantBufferD3D11* particleConstantBuffer, ConstantBufferD3D11 *particleDeltaTime, float particleSize, 
 	ConstantBufferD3D11* tessellationPositions, DirectX::XMFLOAT4 moveObj, MeshD3D11* frustumMesh, 
 	ConstantBufferD3D11* frustumCbuffer, DirectX::BoundingFrustum* cameraFrustum,
-	ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData, float time, float deltaTime,
+	ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData, UINT frameCount, float deltaTime,
 	ConstantBufferD3D11 *froxelDataCB, bool &renderFog, bool &useFroxelFog,
 	ConstantBufferD3D11 *froxelCamCB)
 {
@@ -626,9 +626,8 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	rayConstBuffer->UpdateBuffer(context, &camData);
 
 	RayData rayData;
-	rayData.time = time;
-	rayData.deltaTime = deltaTime;
 	rayData.totalSpotLights = totalSpotLights;
+	rayData.frameCount = frameCount;
 	rayConstData->UpdateBuffer(context, &rayData);
 
 	FroxelCamera froxelCamera;
@@ -898,9 +897,8 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 	rayConstBuffer->Initialize(device, sizeof(CameraData), &camData);
 
 	RayData rayData;
-	rayData.time = 0.0f;
-	rayData.deltaTime = 0.0f;
 	rayData.totalSpotLights = totalSpotLights;
+	rayData.frameCount = 0;
 	rayConstData->Initialize(device, sizeof(RayData), &rayData);
 }
 

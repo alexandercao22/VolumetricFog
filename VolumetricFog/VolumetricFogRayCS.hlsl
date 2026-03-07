@@ -12,9 +12,8 @@ cbuffer camera : register(b8)
 
 cbuffer data : register(b9)
 {
-    float time;
-    float deltaTime;
     uint totalSpotLights;
+    uint frameCount;
 }
 
 struct SpotLightBuffer
@@ -143,8 +142,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
     float2 pixelCoords = DTid.xy;
     float distLimit = min(viewLength, maxDistance);
-    float t = time / max(0.01f, deltaTime); // Should change this to frameCount from C++
-    float distTravelled = IGN(pixelCoords, t) * noiseOffset;
+    float distTravelled = IGN(pixelCoords, frameCount) * noiseOffset;
     float transmittance = 1.0f;
     
     // Ray-marching

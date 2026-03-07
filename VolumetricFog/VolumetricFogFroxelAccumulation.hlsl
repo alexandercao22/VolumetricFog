@@ -7,7 +7,6 @@ cbuffer FroxelCameraCB : register(b9)
     float4 cameraPos;
     float nearZ;
     float farZ;
-    uint totalSpotLights;
     float _pad4;
 };
 

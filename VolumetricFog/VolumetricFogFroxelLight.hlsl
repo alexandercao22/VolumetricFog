@@ -16,14 +16,13 @@ cbuffer FroxelCameraCB : register(b9)
     float4 cameraPos;
     float nearZ;
     float farZ;
-    uint totalSpotLights;
     float _pad4;
 };
 
 cbuffer data : register(b10)
 {
-    float time;
-    float deltaTime;
+    uint totalSpotLights;
+    uint frameCount;
 }
 
 struct SpotLightBuffer
@@ -138,8 +137,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
     float3 nextWorldPos = FroxelToWorldPos(uint3(DTid.xy, DTid.z + 1));
     float froxelDepth = distance(worldPos, nextWorldPos);
-    float t = time / max(0.0001f, deltaTime); // Should change this to frameCount from C++
-    float jitter = IGN(DTid.xy + DTid.z, t) - 0.5f; // Range -0.5 to 0.5
+    float jitter = IGN(DTid.xy + DTid.z, frameCount) - 0.5f; // Range -0.5 to 0.5
     float3 viewDir = normalize(worldPos - cameraPos.xyz);
     float3 shadowPos = worldPos + (viewDir * jitter * froxelDepth);
     

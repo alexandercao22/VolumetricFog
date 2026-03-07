@@ -87,10 +87,9 @@ struct CameraData
 
 struct RayData
 {
-	float time;
-	float deltaTime;
 	UINT totalSpotLights;
-	float padding;
+	UINT frameCount;
+	float padding[2];
 };
 
 struct FroxelData
@@ -146,7 +145,7 @@ void UpdatePerFrame(ID3D11DeviceContext *context, ID3D11Device *&device, UINT to
 	ConstantBufferD3D11 *particleConstantBuffer, ConstantBufferD3D11 *particleDeltaTime, float particleSize,
 	ConstantBufferD3D11 *tessellationPositions, DirectX::XMFLOAT4 moveObj, MeshD3D11 *frustumMesh,
 	ConstantBufferD3D11 *frustumCbuffer, DirectX::BoundingFrustum *cameraFrustum,
-	ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData, float time, float deltaTime,
+	ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData, UINT frameCount, float deltaTime,
 	ConstantBufferD3D11 *froxelDataCB, bool &renderFog, bool &useFroxelFog,
 	ConstantBufferD3D11 *froxelCamCB);
 

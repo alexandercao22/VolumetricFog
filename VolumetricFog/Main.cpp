@@ -205,6 +205,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	camPosConstBuffer.Initialize(device, sizeof(DirectX::XMFLOAT4), &tempPos0);
 	std::chrono::steady_clock::time_point previousTime = std::chrono::steady_clock::now();
 	float deltaTime = 0.0f;
+	UINT frameCount = 0;
 	while (!(GetKeyState(VK_ESCAPE) & 0x8000) && msg.message != WM_QUIT)
 	{
 		std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
@@ -220,10 +221,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 
-		float t = std::chrono::duration<float>(time.time_since_epoch()).count();
 		UpdatePerFrame(immediateContext, device, totalSpotLights, &mainCamera, &cBufferCS, camPosBuffer,
 			&camPosConstBuffer, &particleConstantBuffer, &particleDeltaTime, particleSize, &tessellationPositions, moveObj, &frustumMesh,
-			&frustumCbuffer, &cameraFrustum, &rayConstBuffer, &rayConstData, t, deltaTime, &froxelDataCB, renderFog, useFroxelFog,
+			&frustumCbuffer, &cameraFrustum, &rayConstBuffer, &rayConstData, frameCount, deltaTime, &froxelDataCB, renderFog, useFroxelFog,
 			&froxelCamCB);
 
 		RenderShadowMaps(immediateContext, inputLayout.GetInputLayout(), &spotLights, &shadowVS, &cubeView, meshes, totalMeshes,
@@ -244,6 +244,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		MainCameraMovement(immediateContext, &mainCamera, deltaTime, &window);
 		swapChain->Present(0, 0);
+
+		frameCount++;
 	}
 
 	// Release COM-objects
