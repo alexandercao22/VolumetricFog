@@ -20,12 +20,12 @@ mono_crash.*
 # Build results
 # [Dd]ebug/
 [Dd]ebugPublic/
-[Rr]elease/
+# [Rr]elease/
 [Rr]eleases/
 
 # [Dd]ebug/x64/
 [Dd]ebugPublic/x64/
-[Rr]elease/x64/
+# [Rr]elease/x64/
 [Rr]eleases/x64/
 bin/x64/
 obj/x64/
@@ -435,3 +435,7 @@ VolumetricFog/x64/*
 !x64/Debug/**/*.mtl
 !x64/Debug/**/*.png
 !x64/Debug/**/*.jpg
+!x64/Release/**/*.obj
+!x64/Release/**/*.mtl
+!x64/Release/**/*.png
+!x64/Release/**/*.jpg
