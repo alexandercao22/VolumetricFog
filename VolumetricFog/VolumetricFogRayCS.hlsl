@@ -134,21 +134,22 @@ void main( uint3 DTid : SV_DispatchThreadID )
 
     // Volumetric fog settings
     float density = 0.04f;
-    float maxDistance = 50.0f;
+    const uint nSteps = 16;
     float stepSize = 2.0f;
+    float maxDistance = nSteps * stepSize;
     float noiseOffset = 2.0f;
     float4 fogColor = 0.2f;
     float scattering = 0.3f;
+    float transmittance = 1.0f;
     
     float2 pixelCoords = DTid.xy;
     float distLimit = min(viewLength, maxDistance);
     float distTravelled = IGN(pixelCoords, frameCount) * noiseOffset;
-    float transmittance = 1.0f;
     
     // Ray-marching
-    while (distTravelled < distLimit)
+    for (uint step = 0; step < nSteps; step++)
     {
-        if (transmittance < 0.01f)
+        if (transmittance < 0.01f || distTravelled > distLimit)
             break;
         
         float3 sampleWorldPos = camPos.xyz + rayDir * distTravelled;
