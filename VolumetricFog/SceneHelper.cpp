@@ -961,8 +961,8 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 
 	// Froxel texture 3D
 	D3D11_TEXTURE3D_DESC froxelDesc;
-	froxelDesc.Width = 160*5;
-	froxelDesc.Height = 90*5;
+	froxelDesc.Width = 160;
+	froxelDesc.Height = 90;
 	froxelDesc.Depth = 32;
 	froxelDesc.MipLevels = 1;
 	froxelDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;  // UAV-compatible format
