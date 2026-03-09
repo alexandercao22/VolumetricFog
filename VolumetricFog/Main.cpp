@@ -9,6 +9,9 @@
 #include "SceneHelper.h"
 #include "RenderHelper.h"
 
+#include "GPUProfiler.h"
+#include "BenchmarkLogger.h"
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
@@ -193,6 +196,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	SamplerD3D11 froxelSampler(device, D3D11_TEXTURE_ADDRESS_CLAMP, borderColour);
 	SetupFroxelVolFog(device, &mainCamera, totalSpotLights, &froxelRaysCB, &froxelDataCB, &froxelCamCB,
 		froxelLightTexture, froxelLightUAV, froxelLightSRV, froxelAccTexture, froxelAccUAV, froxelAccSRV);
+
+	// Time measurements
+	GPUProfiler* volumetricProfiler = new GPUProfiler();
+	volumetricProfiler->Initialize(device);
+	BenchmarkLogger* logger = new BenchmarkLogger();
+	int benchMarkFrameCount = 0;
+	bool isBenchmarking = false;
+	constexpr int TOTAL_BENCHMARK_FRAMES = 1000;
 	
 	bool renderFog = true;
 	bool useFroxelFog = false;
@@ -221,6 +232,31 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 
+		// --- Benchmarking ---
+		if (GetAsyncKeyState('R') & 0x8000 && !isBenchmarking) {
+			isBenchmarking = true;
+			benchMarkFrameCount = 0;
+			logger->StartRecording();
+		}
+
+		if (isBenchmarking) {
+			benchMarkFrameCount++;
+
+			if (benchMarkFrameCount < TOTAL_BENCHMARK_FRAMES / 2) {
+				useFroxelFog = true;
+			}
+			else {
+				useFroxelFog = false;
+			}
+		}
+
+		if (benchMarkFrameCount >= TOTAL_BENCHMARK_FRAMES) {
+			logger->StopRecording("Benchmark_results.csv");
+			isBenchmarking = false;
+		}
+
+		// ----------------------
+
 		UpdatePerFrame(immediateContext, device, totalSpotLights, &mainCamera, &cBufferCS, camPosBuffer,
 			&camPosConstBuffer, &particleConstantBuffer, &particleDeltaTime, particleSize, &tessellationPositions, moveObj, &frustumMesh,
 			&frustumCbuffer, &cameraFrustum, &rayConstBuffer, &rayConstData, frameCount, deltaTime, &froxelDataCB, renderFog, useFroxelFog,
@@ -239,8 +275,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			&tessellationHS, &tessellationDS, &tessellationMesh, &tessellationPositions,
 			cullingInputLayout.GetInputLayout(), &cullingVS, &cullingPS, &frustumMesh, &frustumCbuffer,
 			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS, &rayConstBuffer, &rayConstData,
-			&volFogFroxelLightCS, &volFogFroxelAccumulateCS, &froxelRaysCB, &froxelDataCB, &froxelCamCB, 
-			froxelLightUAV, froxelLightSRV, froxelAccUAV, froxelAccSRV, &froxelSampler, renderFog, useFroxelFog);
+			&volFogFroxelLightCS, &volFogFroxelAccumulateCS, &froxelRaysCB, &froxelDataCB, &froxelCamCB,
+			froxelLightUAV, froxelLightSRV, froxelAccUAV, froxelAccSRV, &froxelSampler,
+			volumetricProfiler, logger, benchMarkFrameCount,
+			renderFog, useFroxelFog);
 
 		MainCameraMovement(immediateContext, &mainCamera, deltaTime, &window);
 		swapChain->Present(0, 0);

@@ -331,11 +331,13 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BenchmarkLogger.h" />
     <ClInclude Include="CameraD3D11.h" />
     <ClInclude Include="ConstantBufferD3D11.h" />
     <ClInclude Include="D3D11Helper.h" />
     <ClInclude Include="DepthBufferD3D11.h" />
     <ClInclude Include="DirectionalLight.h" />
+    <ClInclude Include="GPUProfiler.h" />
     <ClInclude Include="IndexBufferD3D11.h" />
     <ClInclude Include="InputLayoutD3D11.h" />
     <ClInclude Include="MainCamera.h" />

@@ -268,8 +268,11 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	ConstantBufferD3D11 *froxelRaysCB, ConstantBufferD3D11 *froxelDataCB, ConstantBufferD3D11 *froxelCamCB,
 	ID3D11UnorderedAccessView *&froxelLightUAV, ID3D11ShaderResourceView*& froxelLightSRV, ID3D11UnorderedAccessView *&froxelAccUAV,
 	ID3D11ShaderResourceView *&froxelAccSRV, SamplerD3D11 *froxelSampler,
+	GPUProfiler* volumetricProfiler, BenchmarkLogger* logger, int benchmarkFrameCount,
 	bool renderFog, bool useFroxelFog)
 {
+	volumetricProfiler->ResolveData(context);
+
 	context->RSSetViewports(1, &viewport);
 	vertexShader->BindShader(context);
 	context->OMSetRenderTargets(1, &rtv, depthStencil->GetDSV(0));
@@ -312,6 +315,8 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 
 	// Unbind RTV's
 	context->OMSetRenderTargets(NR_OF_GBUFFERS, nullRtv, nullptr);
+
+	volumetricProfiler->BeginProfile(context); // Mark start of measurements
 
 	// Froxel-based volumetric fog
 	if (renderFog && useFroxelFog)
@@ -376,6 +381,8 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 		context->Dispatch(240, 135, 1); // X = 1920 / 8 = 240, Y = 1080 / 8 = 135
 	}
 
+	volumetricProfiler->EndProfile(context); // Mark end of measurement
+
 	// Unbind the G-buffer SRV's and UAV
 	ID3D11UnorderedAccessView* nullUav = nullptr;
 	context->CSSetShaderResources(2, NR_OF_GBUFFERS, nullSrv);
@@ -388,7 +395,17 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	delete[] rtvArr;
 	delete[] nullSrv;
 	delete[] nullRtv;
-}
+
+	//std::cerr << "Volumetric pass ";
+	//if (renderFog && !useFroxelFog) std::cerr << "[Raymarching]: ";
+	//else if (renderFog && useFroxelFog) std::cerr << "[Froxel]: ";
+	//else std::cerr << "[No Fog]: ";
+	//std::cerr << std::to_string(volumetricProfiler->GetTimeMS()) + " ms" << std::endl;
+
+	double currentFrameTime = volumetricProfiler->GetTimeMS();
+	if (useFroxelFog)	logger->LogFrame(benchmarkFrameCount, currentFrameTime, 0.0f);
+	else 				logger->LogFrame(benchmarkFrameCount, 0.0f, currentFrameTime);
+}  
 
 void RenderParticles(ID3D11DeviceContext* context, StructuredBufferD3D11* particleBuffer, ShaderD3D11* particleCS,
 	ShaderD3D11* particleVS, ShaderD3D11* particleGS, ShaderD3D11* particlePS, 
