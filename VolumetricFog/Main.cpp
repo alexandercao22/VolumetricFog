@@ -261,7 +261,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		UpdatePerFrame(immediateContext, device, totalSpotLights, &mainCamera, &cBufferCS, camPosBuffer,
 			&camPosConstBuffer, &particleConstantBuffer, &particleDeltaTime, particleSize, &tessellationPositions, moveObj, &frustumMesh,
 			&frustumCbuffer, &cameraFrustum, &rayConstBuffer, &rayConstData, frameCount, deltaTime, &froxelDataCB, renderFog, useFroxelFog,
-			&froxelCamCB);
+			&froxelCamCB, isBenchmarking);
 
 		RenderShadowMaps(immediateContext, inputLayout.GetInputLayout(), &spotLights, &shadowVS, &cubeView, meshes, totalMeshes,
 			&reflectiveMesh, &directionLight, &tessellationMesh);

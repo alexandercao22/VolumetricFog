@@ -474,14 +474,21 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	ConstantBufferD3D11* frustumCbuffer, DirectX::BoundingFrustum* cameraFrustum,
 	ConstantBufferD3D11 *rayConstBuffer, ConstantBufferD3D11 *rayConstData, UINT frameCount, float deltaTime,
 	ConstantBufferD3D11 *froxelDataCB, bool &renderFog, bool &useFroxelFog,
-	ConstantBufferD3D11 *froxelCamCB)
+	ConstantBufferD3D11 *froxelCamCB, bool isBenchmarking)
 {
 	mainCamera->UpdateMatrixInfo();
 	MatrixInfo camMat = mainCamera->GetMatrixInfo();
 	{
-		if (GetKeyState('G')) // Toggle fog mode
+		if (!isBenchmarking)
 		{
-			useFroxelFog = !useFroxelFog;
+			if (GetKeyState('G')) // Toggle fog mode
+			{
+				useFroxelFog = true;
+			}
+			else
+			{
+				useFroxelFog = false;
+			}
 		}
 
 		DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&camMat.position);
