@@ -9,6 +9,8 @@
 #include "SceneHelper.h"
 #include "RenderHelper.h"
 
+#include "GPUProfiler.h"
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
@@ -193,6 +195,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	SamplerD3D11 froxelSampler(device, D3D11_TEXTURE_ADDRESS_CLAMP, borderColour);
 	SetupFroxelVolFog(device, &mainCamera, totalSpotLights, &froxelRaysCB, &froxelDataCB, &froxelCamCB,
 		froxelLightTexture, froxelLightUAV, froxelLightSRV, froxelAccTexture, froxelAccUAV, froxelAccSRV);
+
+	// Time measurements
+	GPUProfiler* volumetricProfiler;
+	volumetricProfiler->Initialize(device, immediateContext);
 	
 	bool renderFog = true;
 	bool useFroxelFog = false;
@@ -239,8 +245,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			&tessellationHS, &tessellationDS, &tessellationMesh, &tessellationPositions,
 			cullingInputLayout.GetInputLayout(), &cullingVS, &cullingPS, &frustumMesh, &frustumCbuffer,
 			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS, &rayConstBuffer, &rayConstData,
-			&volFogFroxelLightCS, &volFogFroxelAccumulateCS, &froxelRaysCB, &froxelDataCB, &froxelCamCB, 
-			froxelLightUAV, froxelLightSRV, froxelAccUAV, froxelAccSRV, &froxelSampler, renderFog, useFroxelFog);
+			&volFogFroxelLightCS, &volFogFroxelAccumulateCS, &froxelRaysCB, &froxelDataCB, &froxelCamCB,
+			froxelLightUAV, froxelLightSRV, froxelAccUAV, froxelAccSRV, &froxelSampler,
+			volumetricProfiler,
+			renderFog, useFroxelFog);
 
 		MainCameraMovement(immediateContext, &mainCamera, deltaTime, &window);
 		swapChain->Present(0, 0);

@@ -143,6 +143,7 @@
     <FxCompile Include="VolumetricFogFroxelLight.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
+    <FxCompile Include="VolumetricFogFroxelAccumulation.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowHelper.h">
@@ -215,6 +216,9 @@
       <Filter>Header Files\Project Classes</Filter>
     </ClInclude>
     <ClInclude Include="QuadTree.h">
+      <Filter>Header Files\Project Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="GPUProfiler.h">
       <Filter>Header Files\Project Classes</Filter>
     </ClInclude>
   </ItemGroup>

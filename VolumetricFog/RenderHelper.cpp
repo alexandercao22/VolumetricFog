@@ -268,6 +268,7 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	ConstantBufferD3D11 *froxelRaysCB, ConstantBufferD3D11 *froxelDataCB, ConstantBufferD3D11 *froxelCamCB,
 	ID3D11UnorderedAccessView *&froxelLightUAV, ID3D11ShaderResourceView*& froxelLightSRV, ID3D11UnorderedAccessView *&froxelAccUAV,
 	ID3D11ShaderResourceView *&froxelAccSRV, SamplerD3D11 *froxelSampler,
+	GPUProfiler* volumetricProfiler,
 	bool renderFog, bool useFroxelFog)
 {
 	context->RSSetViewports(1, &viewport);
