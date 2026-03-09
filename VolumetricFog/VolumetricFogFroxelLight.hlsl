@@ -124,7 +124,7 @@ float IGN(float2 pixel, int frame)
     return frac(52.9829189f * frac(0.06711056f * float(x) + 0.00583715f * float(y)));
 }
 
-[numthreads(8, 8, 4)] // UAV dimensions = 160, 90, 32. Dispatch(20, 12, 8)
+[numthreads(8, 8, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
     uint3 dimensions;

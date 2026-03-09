@@ -64,7 +64,7 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	ID3D11UnorderedAccessView*& froxelLightUAV, ID3D11ShaderResourceView*& froxelLightSRV, ID3D11UnorderedAccessView*& froxelAccUAV,
 	ID3D11ShaderResourceView*& froxelAccSRV, SamplerD3D11* froxelSampler,
 	GPUProfiler* volumetricProfiler, BenchmarkLogger* logger, int benchmarkFrameCount,
-	bool renderFog, bool useFroxelFog);
+	bool renderFog, bool useFroxelFog, int froxelSteps);
 
 void RenderParticles(ID3D11DeviceContext *context, StructuredBufferD3D11 *particleBuffer, ShaderD3D11 *particleCS,
 	ShaderD3D11 *particleVS, ShaderD3D11 *particleGS, ShaderD3D11 *particlePS,

@@ -170,4 +170,4 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 	ConstantBufferD3D11 *froxelRaysCB, ConstantBufferD3D11 *froxelDataCB, ConstantBufferD3D11 *froxelCamCB,
 	ID3D11Texture3D *&froxelLightTexture, ID3D11UnorderedAccessView *&froxelLightUAV, ID3D11ShaderResourceView*& froxelLightSRV,
 	ID3D11Texture3D *&froxelAccTexture, ID3D11UnorderedAccessView *&froxelAccUAV,
-	ID3D11ShaderResourceView *&froxelAccSRV);
+	ID3D11ShaderResourceView *&froxelAccSRV, int froxelSteps);

@@ -194,8 +194,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ID3D11ShaderResourceView* froxelLightSRV = nullptr;
 	ID3D11ShaderResourceView* froxelAccSRV = nullptr;
 	SamplerD3D11 froxelSampler(device, D3D11_TEXTURE_ADDRESS_CLAMP, borderColour);
+	int froxelSteps = 8;
 	SetupFroxelVolFog(device, &mainCamera, totalSpotLights, &froxelRaysCB, &froxelDataCB, &froxelCamCB,
-		froxelLightTexture, froxelLightUAV, froxelLightSRV, froxelAccTexture, froxelAccUAV, froxelAccSRV);
+		froxelLightTexture, froxelLightUAV, froxelLightSRV, froxelAccTexture, froxelAccUAV, froxelAccSRV, froxelSteps);
 
 	// Time measurements
 	GPUProfiler* volumetricProfiler = new GPUProfiler();
@@ -278,7 +279,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			&volFogFroxelLightCS, &volFogFroxelAccumulateCS, &froxelRaysCB, &froxelDataCB, &froxelCamCB,
 			froxelLightUAV, froxelLightSRV, froxelAccUAV, froxelAccSRV, &froxelSampler,
 			volumetricProfiler, logger, benchMarkFrameCount,
-			renderFog, useFroxelFog);
+			renderFog, useFroxelFog, froxelSteps);
 
 		MainCameraMovement(immediateContext, &mainCamera, deltaTime, &window);
 		swapChain->Present(0, 0);

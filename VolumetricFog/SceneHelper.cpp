@@ -901,7 +901,7 @@ void SetupRayMarchingVolFog(ID3D11Device *&device, ConstantBufferD3D11 *rayConst
 void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT totalSpotLights,
 	ConstantBufferD3D11 *froxelRaysCB, ConstantBufferD3D11 *froxelDataCB, ConstantBufferD3D11 *froxelCamCB,
 	ID3D11Texture3D *&froxelLightTexture, ID3D11UnorderedAccessView *&froxelLightUAV, ID3D11ShaderResourceView*& froxelLightSRV,
-	ID3D11Texture3D *&froxelAccTexture, ID3D11UnorderedAccessView *&froxelAccUAV, ID3D11ShaderResourceView *&froxelAccSRV)
+	ID3D11Texture3D *&froxelAccTexture, ID3D11UnorderedAccessView *&froxelAccUAV, ID3D11ShaderResourceView *&froxelAccSRV, int froxelSteps)
 {
 	MatrixInfo cameraMatrix = mainCamera->GetMatrixInfo();
 
@@ -959,7 +959,7 @@ void SetupFroxelVolFog(ID3D11Device *&device, MainCamera *mainCamera, UINT total
 	D3D11_TEXTURE3D_DESC froxelDesc;
 	froxelDesc.Width = 160;
 	froxelDesc.Height = 90;
-	froxelDesc.Depth = 32;
+	froxelDesc.Depth = froxelSteps;
 	froxelDesc.MipLevels = 1;
 	froxelDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;  // UAV-compatible format
 	froxelDesc.Usage = D3D11_USAGE_DEFAULT;

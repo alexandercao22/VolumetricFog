@@ -269,7 +269,7 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	ID3D11UnorderedAccessView *&froxelLightUAV, ID3D11ShaderResourceView*& froxelLightSRV, ID3D11UnorderedAccessView *&froxelAccUAV,
 	ID3D11ShaderResourceView *&froxelAccSRV, SamplerD3D11 *froxelSampler,
 	GPUProfiler* volumetricProfiler, BenchmarkLogger* logger, int benchmarkFrameCount,
-	bool renderFog, bool useFroxelFog)
+	bool renderFog, bool useFroxelFog, int froxelSteps)
 {
 	volumetricProfiler->ResolveData(context);
 
@@ -331,7 +331,7 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 		context->CSSetConstantBuffers(9, 1, &froxelCam);
 		context->CSSetConstantBuffers(10, 1, &rayData);
 		context->CSSetUnorderedAccessViews(1, 1, &froxelLightUAV, nullptr);
-		context->Dispatch(20, 12, 16);
+		context->Dispatch(20, 12, froxelSteps); // Change this for steps
 
 		ID3D11UnorderedAccessView* nullUav = nullptr;
 		context->CSSetUnorderedAccessViews(1, 1, &nullUav, nullptr);
@@ -395,12 +395,6 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	delete[] rtvArr;
 	delete[] nullSrv;
 	delete[] nullRtv;
-
-	//std::cerr << "Volumetric pass ";
-	//if (renderFog && !useFroxelFog) std::cerr << "[Raymarching]: ";
-	//else if (renderFog && useFroxelFog) std::cerr << "[Froxel]: ";
-	//else std::cerr << "[No Fog]: ";
-	//std::cerr << std::to_string(volumetricProfiler->GetTimeMS()) + " ms" << std::endl;
 
 	double currentFrameTime = volumetricProfiler->GetTimeMS();
 	if (useFroxelFog)	logger->LogFrame(benchmarkFrameCount, currentFrameTime, 0.0f);
