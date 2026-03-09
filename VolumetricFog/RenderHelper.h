@@ -19,6 +19,7 @@
 #include "DirectionalLight.h"
 #include "QuadTree.h"
 #include "GPUProfiler.h"
+#include "BenchmarkLogger.h"
 
 void Render(ID3D11DeviceContext* context, D3D11_VIEWPORT& viewport, ShaderD3D11* vertexShader, ShaderD3D11* pixelShader,
 	ID3D11InputLayout* inputLayout, ID3D11SamplerState** meshSamplerState, MeshD3D11* meshes, size_t totalMeshes,
@@ -62,7 +63,7 @@ void DeferredRendering(ID3D11DeviceContext* context, DepthBufferD3D11* depthSten
 	ConstantBufferD3D11* froxelRaysCB, ConstantBufferD3D11* froxelDataCB, ConstantBufferD3D11* froxelCamCB,
 	ID3D11UnorderedAccessView*& froxelLightUAV, ID3D11ShaderResourceView*& froxelLightSRV, ID3D11UnorderedAccessView*& froxelAccUAV,
 	ID3D11ShaderResourceView*& froxelAccSRV, SamplerD3D11* froxelSampler,
-	GPUProfiler* volumetricProfiler,
+	GPUProfiler* volumetricProfiler, BenchmarkLogger* logger, int benchmarkFrameCount,
 	bool renderFog, bool useFroxelFog);
 
 void RenderParticles(ID3D11DeviceContext *context, StructuredBufferD3D11 *particleBuffer, ShaderD3D11 *particleCS,

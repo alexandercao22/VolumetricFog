@@ -219,7 +219,10 @@
       <Filter>Header Files\Project Classes</Filter>
     </ClInclude>
     <ClInclude Include="GPUProfiler.h">
-      <Filter>Header Files\Project Classes</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BenchmarkLogger.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

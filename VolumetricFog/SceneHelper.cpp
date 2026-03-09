@@ -459,11 +459,7 @@ void UpdatePerFrame(ID3D11DeviceContext* context, ID3D11Device*& device, UINT to
 	{
 		if (GetKeyState('G')) // Toggle fog mode
 		{
-			useFroxelFog = true;
-		}
-		else
-		{
-			useFroxelFog = false;
+			useFroxelFog = !useFroxelFog;
 		}
 
 		DirectX::XMVECTOR position = DirectX::XMLoadFloat3(&camMat.position);

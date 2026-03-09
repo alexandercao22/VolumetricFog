@@ -10,6 +10,7 @@
 #include "RenderHelper.h"
 
 #include "GPUProfiler.h"
+#include "BenchmarkLogger.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -197,8 +198,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		froxelLightTexture, froxelLightUAV, froxelLightSRV, froxelAccTexture, froxelAccUAV, froxelAccSRV);
 
 	// Time measurements
-	GPUProfiler* volumetricProfiler;
-	volumetricProfiler->Initialize(device, immediateContext);
+	GPUProfiler* volumetricProfiler = new GPUProfiler();
+	volumetricProfiler->Initialize(device);
+	BenchmarkLogger* logger = new BenchmarkLogger();
+	int benchMarkFrameCount = 0;
+	bool isBenchmarking = false;
+	constexpr int TOTAL_BENCHMARK_FRAMES = 1000;
 	
 	bool renderFog = true;
 	bool useFroxelFog = false;
@@ -226,6 +231,31 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 
+		// --- Benchmarking ---
+		if (GetAsyncKeyState('R') & 0x8000 && !isBenchmarking) {
+			isBenchmarking = true;
+			benchMarkFrameCount = 0;
+			logger->StartRecording();
+		}
+
+		if (isBenchmarking) {
+			benchMarkFrameCount++;
+
+			if (benchMarkFrameCount < TOTAL_BENCHMARK_FRAMES / 2) {
+				useFroxelFog = true;
+			}
+			else {
+				useFroxelFog = false;
+			}
+		}
+
+		if (benchMarkFrameCount >= TOTAL_BENCHMARK_FRAMES) {
+			logger->StopRecording("Benchmark_results.csv");
+			isBenchmarking = false;
+		}
+
+		// ----------------------
+
 		float t = std::chrono::duration<float>(time.time_since_epoch()).count();
 		UpdatePerFrame(immediateContext, device, totalSpotLights, &mainCamera, &cBufferCS, camPosBuffer,
 			&camPosConstBuffer, &particleConstantBuffer, &particleDeltaTime, particleSize, &tessellationPositions, moveObj, &frustumMesh,
@@ -247,7 +277,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			&quadTree, &cameraFrustum, meshBoundingBoxLines, &volFogRayCS, &rayConstBuffer, &rayConstData,
 			&volFogFroxelLightCS, &volFogFroxelAccumulateCS, &froxelRaysCB, &froxelDataCB, &froxelCamCB,
 			froxelLightUAV, froxelLightSRV, froxelAccUAV, froxelAccSRV, &froxelSampler,
-			volumetricProfiler,
+			volumetricProfiler, logger, benchMarkFrameCount,
 			renderFog, useFroxelFog);
 
 		MainCameraMovement(immediateContext, &mainCamera, deltaTime, &window);

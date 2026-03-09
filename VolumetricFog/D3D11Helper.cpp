@@ -87,6 +87,7 @@ bool SetupD3D11(UINT width, UINT height, HWND window, ID3D11Device*& device,
 	ID3D11DeviceContext*& immediateContext, IDXGISwapChain*& swapChain, ID3D11RenderTargetView*& rtv,
 	D3D11_VIEWPORT& viewport)
 {
+
 	if (!CreateInterfaces(device, immediateContext, swapChain, width, height, window))
 	{
 		std::cerr << "Error creating interfaces!" << std::endl;

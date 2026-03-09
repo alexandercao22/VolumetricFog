@@ -331,6 +331,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BenchmarkLogger.h" />
     <ClInclude Include="CameraD3D11.h" />
     <ClInclude Include="ConstantBufferD3D11.h" />
     <ClInclude Include="D3D11Helper.h" />

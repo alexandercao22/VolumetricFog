@@ -16,7 +16,6 @@ struct ProfilerFrame {
 
 class GPUProfiler {
 	ID3D11Device* device;
-	ID3D11DeviceContext* context;
 
 	ProfilerFrame frames[QUERY_LATENCY_FRAMES];
 	int currentFrameIndex = 0;
@@ -24,9 +23,8 @@ class GPUProfiler {
 	double lastMeasuredTimeMS = 0.0;
 
 public:
-	void Initialize(ID3D11Device* devicePtr, ID3D11DeviceContext* contextPtr) {
+	void Initialize(ID3D11Device* devicePtr) {
 		device = devicePtr;
-		context = contextPtr;
 
 		D3D11_QUERY_DESC desc = {};
 		for (int i = 0; i < QUERY_LATENCY_FRAMES; i++) {
@@ -39,7 +37,7 @@ public:
 		}
 	}
 
-	void BeginProfile() {
+	void BeginProfile(ID3D11DeviceContext* context) {
 		ProfilerFrame& frame = frames[currentFrameIndex];
 
 		context->Begin(frame.disjointQuery); // Start tracking
@@ -48,7 +46,7 @@ public:
 		frame.queryStarted = true;
 	}
 
-	void EndProfile() {
+	void EndProfile(ID3D11DeviceContext* context) {
 		ProfilerFrame& frame = frames[currentFrameIndex];
 		if (!frame.queryStarted) return;
 
@@ -58,14 +56,19 @@ public:
 		frame.queryEnded = true;
 	}
 
-	void ResolveData() {
+	void ResolveData(ID3D11DeviceContext* context) {
 		currentFrameIndex = (currentFrameIndex + 1) % QUERY_LATENCY_FRAMES;
 
 		ProfilerFrame& oldFrame = frames[currentFrameIndex];
 		if (oldFrame.queryEnded) {
+
+			while (context->GetData(oldFrame.disjointQuery, NULL, 0, 0) == S_FALSE) {
+				// Spin wait
+			}
+
 			D3D11_QUERY_DATA_TIMESTAMP_DISJOINT disjointData;
 			
-			if (context->GetData(oldFrame.disjointQuery, &disjointData, sizeof(disjointData), D3D11_ASYNC_GETDATA_DONOTFLUSH) == S_OK) {
+			if (context->GetData(oldFrame.disjointQuery, &disjointData, sizeof(disjointData), 0) == S_OK) {
 				if (!disjointData.Disjoint) {
 					UINT64 start = 0, end = 0;
 					context->GetData(oldFrame.startQuery, &start, sizeof(start), 0);
@@ -80,7 +83,6 @@ public:
 			oldFrame.queryEnded = false;
 			oldFrame.queryStarted = false;
 		}
-
 	}
 
 	double GetTimeMS() const { return lastMeasuredTimeMS; }
